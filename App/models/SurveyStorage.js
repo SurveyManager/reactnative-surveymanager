@@ -37,7 +37,7 @@ var SurveyStorage = function () {
 	
 	this._get = function (key) {
 		try {
-			var value = await AsyncStorage.getItem('@MySuperStore:key');
+			var value = await AsyncStorage.getItem(this.prefix+":"+key);
 			if (value !== null){
 				return value;
 			} else {

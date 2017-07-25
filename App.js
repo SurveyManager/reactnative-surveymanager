@@ -8,7 +8,7 @@ import { Constants } from 'expo';
 
 var uuid = require('react-native-uuid');
 
-var _storage = require('./App/models/storage.js');
+var _storage = require('./App/models/SurveyStorage.js');
 	Sstorage=new _storage();
 	Sstorage.init({});
 	
