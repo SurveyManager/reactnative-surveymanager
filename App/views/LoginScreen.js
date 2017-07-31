@@ -10,8 +10,10 @@ import l18n from '../localization/LoginScreen.js';
 
 
 class LoginScreen extends React.Component {
+	static waitTimer = false;
+	
   static navigationOptions = {
-    title: l18n.title,
+    title: l18n.htitle,
   };
   
   focusNextField = (nextField) => {
@@ -22,17 +24,45 @@ class LoginScreen extends React.Component {
 		"password": false
 	  }
   doAuth = function () {
-	  restapi.doLogin(this.formState.login.text, this.formState.password.text, 
+	  restapi.doAuth(this.formState.login.text, this.formState.password.text, 
 		function(r) { this.doAuthSuccess(r); }.bind(this), 
 		function(r) { this.doAuthError(r); }.bind(this));
   }
   doAuthSuccess = function (r) {
-	  Sstorage.setToken(r['token']);
+	  Sstorage.setToken(r);
+  }
+  doAfterAuthSuccess = function () {
+	  const resetAction = NavigationActions.reset({
+		index: 0,
+		actions: [
+			NavigationActions.navigate({ routeName: 'Main'})
+		]
+		})
+		this.props.navigation.dispatch(resetAction);
   }
   
   doAuthError = function (r) {
   }
   
+  checkToken = function () {
+	  clearInterval(this.waitTimer);
+		Sstorage.getToken().then( function (v) { 
+			if (v) {
+				restapi.credentials = v;
+				this.doAfterAuthSuccess();
+			} 
+		}.bind(this));
+  }
+  
+  componentDidMount() {
+	  this.waitTimer = setInterval (function () { 
+		if (survey.ready) { 
+			this.checkToken(); 
+		} else { 
+			console.warn("WAIT...", survey.ready); 
+		} 
+		}.bind(this), 100);
+  }
   
   render() {
     return (
@@ -42,6 +72,10 @@ class LoginScreen extends React.Component {
     <Button
           onPress={() => this.doAuth()}
           title={l18n.login}
+        />
+    <Button
+          onPress={() => this.checkToken()}
+          title="DBG"
         />
      </View>
     );

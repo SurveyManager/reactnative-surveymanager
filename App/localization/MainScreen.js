@@ -1,6 +1,6 @@
 var l18n = {
-    domains: "Domains",
-    loading: "Loading"
+    htitle: "Survey",
+    loading: "Loading..."
   };
 
 module.exports = l18n;

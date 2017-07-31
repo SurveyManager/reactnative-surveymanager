@@ -1,5 +1,7 @@
 'use strict';
 
+import { AsyncStorage } from 'react-native';
+
 var SurveyStorage = function () {
 	this.config=false;
 	this.prefix="SurveyStorage";
@@ -26,25 +28,30 @@ var SurveyStorage = function () {
 		return this._get("token");
 	}
 	
+	this.setSurvey = function (survey) {
+		return this._set("survey",survey);
+	}
+	this.getSurvey = function () {
+		return this._get("survey");
+	}
+	
 	this._set = function (key, value) {
 		try {
-			await AsyncStorage.setItem(this.prefix+":"+key, value);
+			console.log("SS-set", this.prefix+":"+key, value);
+			AsyncStorage.setItem(this.prefix+":"+key, value);
 			return true;
 		} catch (error) {
-			return false;
+			console.warn("setERROR", error);
 		}
 	}
 	
 	this._get = function (key) {
 		try {
-			var value = await AsyncStorage.getItem(this.prefix+":"+key);
-			if (value !== null){
-				return value;
-			} else {
-				return false;
-			}
+			//console.log("SS-get", this.prefix+":"+key);
+			//AsyncStorage.getItem(this.prefix+":"+key).then( function (_callback, key, value) { _callback(key,value); }.bind(null, _callback, key, value ); ).done();
+			return AsyncStorage.getItem(this.prefix+":"+key);
 		} catch (error) {
-			return false;
+			console.warn("getERROR", error);
 		}
 	}
 }

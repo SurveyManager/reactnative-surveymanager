@@ -1,6 +1,6 @@
 var l18n = {
     login: "Sign in",
-    title: "SilverStripe SurveyManager",
+    htitle: "SilverStripe SurveyManager",
     plogin: "Email",
     ppassword: "Password",
     autherror: "Unable to login"

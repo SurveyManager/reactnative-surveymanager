@@ -3,87 +3,86 @@ import {
   AppRegistry,
   Text,
   View,
-  ToastAndroid,
-  ListView,
   StyleSheet,
-  TouchableHighlight,
   ScrollView,
+  TouchableOpacity,
+  Button
 } from 'react-native';
 import { StackNavigator, NavigationActions, } from 'react-navigation';
 import l18n from '../localization/MainScreen.js';
 
+const MainScreenStyles = StyleSheet.create({
+	NavView: {
+		flexDirection: 'row', 
+		width: 140, 
+	},
+	NavBtn: {
+		width: 60,
+		margin: 5, 
+		padding: 10, 
+		borderRadius: 4, 
+		borderWidth: 0.5, 
+		borderColor: '#d6d7da', 
+		backgroundColor: '#ff0000',
+	},
+	NavBtnTxt: {
+		textAlign: 'center',
+		color: '#ffffff'
+	},
+	surveyTitle: {
+		fontSize: 20,
+		paddingTop: 5,
+		paddingBottom: 5,
+		paddingLeft: 5,
+		paddingRight: 5,
+	},
+	articleDescription: {
+		fontSize: 15,
+		paddingTop: 10,
+		paddingBottom: 5,
+		paddingLeft: 5,
+		paddingRight: 5,
+		lineHeight: 25
+	}
+});
+
 
 class MainScreen extends React.Component {
   static navigationOptions = {
-    title: "SurveyManager",
+    title: l18n.htitle,
+    headerRight: ( <View style={MainScreenStyles.NavView}><TouchableOpacity style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>New</Text></TouchableOpacity><TouchableOpacity style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>Sync</Text></TouchableOpacity></View> )
   };
 
   
   constructor() {
     super();
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
     this.state = {
-      dataSource: ds.cloneWithRows([l18n.loading+'...']),
+      survey: false,
     };
   }
 
-  doList = function () {
-	/*restapi.doDomains(
-		function(r) { 
-			this.doListSuccess(r); }.bind(this), 
-		function(r) { 
-			this.doListError(r); }.bind(this)
-		);*/
-  }
-
-  doListSuccess = function (r) {
-	  var domains_list=new Array();
-	  for (var i in r) {
-		  domains_list[domains_list.length]=r[i]['http'];
-	  }
-		this.setState({
-			dataSource: this.state.dataSource.cloneWithRows(domains_list),
-		});
-	  
-  }
-  doListError = function (r) {
-	  // TODO better error handler
-	  //ToastAndroid.show("ERROR:"+r, ToastAndroid.SHORT);
+  doLoad = function () {
+	  survey.getSurvey( function (r) {
+			this.setState({ survey: r });
+			//this.forceUpdate();
+		  }.bind(this) );
   }
  
 	componentDidMount() {
-		//this.doList();
+		this.doLoad();
 	} 
 
   render() {
 	const { navigate } = this.props.navigation;
     return (
       <View>
-        <ListView
-        dataSource={this.state.dataSource} 
-        renderRow={(rowData) => <TouchableHighlight><Text style={styles.listviewitembig}>{rowData}</Text></TouchableHighlight>} 
-        renderSeparator={(sectionId, rowId) => <View key={rowId} style={styles.separator} />}
-      />
+		<ScrollView>
+			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.Description}</Text>
+		</ScrollView>
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  listviewitembig: {
-    flex: 1,
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 5,
-    paddingRight: 5,
-    fontSize: 19,
-  },
-  separator: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#8E8E8E',
-  },
-});
 
 
 export default MainScreen;

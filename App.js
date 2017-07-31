@@ -1,7 +1,7 @@
 import React from 'react';
 import LoginScreen from './App/views/LoginScreen.js';
 import MainScreen from './App/views/MainScreen.js';
-import { AppRegistry, View, StyleSheet, Dimensions, } from 'react-native';
+import { AppRegistry, View, StyleSheet, Dimensions, AsyncStorage, NetInfo } from 'react-native';
 import { StackNavigator, } from 'react-navigation';
 import { Constants } from 'expo';
 
@@ -14,7 +14,22 @@ var _storage = require('./App/models/SurveyStorage.js');
 	
 var _restapi = require('./App/models/restapi.js');
 	restapi=new _restapi();
-	restapi.init("https://survey.sovgvd.info/your-surveys/API");
+	restapi.init("https://survey.sovgvd.info/your-survey/API/");
+	
+var _manager = require('./App/models/Survey.js');
+	survey = new _manager();
+	survey.init({},Sstorage);
+
+NetInfo.fetch().then( function (survey,t) {
+	survey.networkChange(t);
+}.bind(null, survey));
+
+NetInfo.addEventListener(
+  'change',
+  function (survey, t) { survey.networkChange(t); }.bind(null, survey)
+);
+
+
 
 const MainNavigator = StackNavigator({
   Home: { screen: LoginScreen },
