@@ -1,5 +1,16 @@
 'use strict';
+
 import React from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Button
+} from 'react-native';
+
+
 
 var SurveyManager = function () {
 	this.config=false;
@@ -47,7 +58,12 @@ var SurveyManager = function () {
 	
 	this.renderSurveyInfo = function () {
 		if (this.getSurveyCallback) {
-			this.getSurveyCallback(this.survey.survey);
+			let ele1 = (
+      <View>
+        <Text>Hello</Text>
+      </View>
+     );
+			this.getSurveyCallback(this.survey.survey, ele1);
 		}
 			//var ret="<Text style={MainScreenStyles.surveyTitle}>"+this.survey.survey.title+"</Text><Text style={MainScreenStyles.surveyDescription}>"+this.survey.survey.Description+"</Text>";
 

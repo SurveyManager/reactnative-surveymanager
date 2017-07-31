@@ -30,6 +30,7 @@ class LoginScreen extends React.Component {
   }
   doAuthSuccess = function (r) {
 	  Sstorage.setToken(r);
+	  this.doAfterAuthSuccess();
   }
   doAfterAuthSuccess = function () {
 	  const resetAction = NavigationActions.reset({
@@ -72,10 +73,6 @@ class LoginScreen extends React.Component {
     <Button
           onPress={() => this.doAuth()}
           title={l18n.login}
-        />
-    <Button
-          onPress={() => this.checkToken()}
-          title="DBG"
         />
      </View>
     );

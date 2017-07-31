@@ -58,12 +58,14 @@ class MainScreen extends React.Component {
     super();
     this.state = {
       survey: false,
+      q: []
     };
   }
 
   doLoad = function () {
-	  survey.getSurvey( function (r) {
-			this.setState({ survey: r });
+	  survey.getSurvey( function (r,e) {
+			
+			this.setState({ survey: r, q: e });
 			//this.forceUpdate();
 		  }.bind(this) );
   }
@@ -78,6 +80,7 @@ class MainScreen extends React.Component {
       <View>
 		<ScrollView>
 			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.Description}</Text>
+			{ this.state.q }
 		</ScrollView>
       </View>
     );
