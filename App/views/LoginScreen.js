@@ -23,6 +23,7 @@ class LoginScreen extends React.Component {
 		"login": false,
 		"password": false
 	  }
+	  
   doAuth = function () {
 	  restapi.doAuth(this.formState.login.text, this.formState.password.text, 
 		function(r) { this.doAuthSuccess(r); }.bind(this), 

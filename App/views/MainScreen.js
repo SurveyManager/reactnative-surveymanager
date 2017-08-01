@@ -50,7 +50,7 @@ const MainScreenStyles = StyleSheet.create({
 class MainScreen extends React.Component {
   static navigationOptions = {
     title: l18n.htitle,
-    headerRight: ( <View style={MainScreenStyles.NavView}><TouchableOpacity style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>New</Text></TouchableOpacity><TouchableOpacity style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>Sync</Text></TouchableOpacity></View> )
+    headerRight: ( <View style={MainScreenStyles.NavView}><TouchableOpacity onPress={() => this.newSurvey()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>New</Text></TouchableOpacity><TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>Next</Text></TouchableOpacity></View> )
   };
 
   
@@ -61,7 +61,7 @@ class MainScreen extends React.Component {
       q: []
     };
   }
-
+  
   doLoad = function () {
 	  survey.getSurvey( function (r,e) {
 			
@@ -79,7 +79,7 @@ class MainScreen extends React.Component {
     return (
       <View>
 		<ScrollView>
-			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.Description}</Text>
+			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 			{ this.state.q }
 		</ScrollView>
       </View>

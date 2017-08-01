@@ -36,8 +36,18 @@ const MainNavigator = StackNavigator({
   Main: { screen: MainScreen },
 });
 
+nextQuestion = function () {
+	survey.nextQuestion();
+}
+
+newSurvey = function () {
+	// TODO ask before new
+	survey.surveyNew();
+}
+
 
 export default class App extends React.Component {
+
   render() {
     return (
       <View style={styles.container}>
