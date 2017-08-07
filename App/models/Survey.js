@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   View,
+  ListView,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -13,6 +14,23 @@ import {
 
 const suuid = require('uuid/v4');
 const quuid = require('uuid/v1');
+
+const SurveyStyles = StyleSheet.create({
+	textBtn : {
+		padding: 10,
+	},
+	
+	activeOpionStyle : {
+		backgroundColor: '#00ff00',	// TODO better color
+		padding: 20
+	},
+	opionStyle : {
+		backgroundColor: '#ff0000',
+		padding: 20
+	}
+
+});
+
 
 var SurveyManager = function () {
 	this.config=false;
@@ -28,6 +46,9 @@ var SurveyManager = function () {
 	this.currentQuestionsNum = 0;
 	this.questionFormState = {};
 	this.surveyStarted = false;
+	this.showLoginActivity = false;
+	this.currentQuestionOptions = false;
+	this.currentQuestionOptionsObj = false;
 	
 	this.init = function (_config,_storage) {
 		this.config=_config;
@@ -103,22 +124,58 @@ var SurveyManager = function () {
 		}
 	}
 	
-	this.renderQuestion = function () {
-		this.currentQuestion=this.survey.questions[this.currentQuestionID];
-		console.log("RENDER", this.currentQuestion);
-		this.questionFormState.SH = this.currentSurveyUUID;
-		this.questionFormState.QH = quuid();
-		this.questionFormState.qid = this.currentQuestion.id;
-		if (this.getSurveyCallback) {
-			let r = (<View></View>);
-			if (this.currentQuestion.type=='text') {
-				r = (<View><TextInput onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
-			}
-			// TODO
-			this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r);
+	this.questionFormStateOption = function (id, is_one) {
+		if (is_one) {
+			this.questionFormState.o = {};
 		}
+		if (this.questionFormState.o[id]) {
+			this.questionFormState.o[id]=false;
+		} else {
+			this.questionFormState.o[id]=true;
+		}
+		
+		this.renderQuestion(true);
 	}
 	
+	this.questionFormStateGet = function (id) {
+		return this.questionFormState.o[id];
+	}
+	
+	this.renderQuestionRender = function (r) {
+		this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r);
+	}
+	
+	this.renderQuestion = function (doreinit) {
+		this.currentQuestion=this.survey.questions[this.currentQuestionID];
+		if (!doreinit) {
+			this.questionFormState.SH = this.currentSurveyUUID;
+			this.questionFormState.QH = quuid();
+			this.questionFormState.qid = this.currentQuestion.id;
+			this.questionFormState.o = {};
+		}
+		if (this.getSurveyCallback) {
+			let r = (<View></View>);
+			// TODO not maintainable!!!
+			if (this.currentQuestion.type=='text') {
+				r = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
+			} else if (this.currentQuestion.type=='one' || this.currentQuestion.type=='multi') {
+				this.currentQuestionOptionsObj = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+				var tmp = this.currentQuestion.options;
+				for (var i in tmp) {
+					if (tmp[i].id) { tmp[i].state=this.questionFormState.o[(tmp[i].id)]?true:false; }
+				}
+				this.currentQuestionOptions = this.currentQuestionOptionsObj.cloneWithRows(tmp);
+				if (this.currentQuestion.type=='one') {
+					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, true) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
+				} else {
+					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, false) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
+				}
+			} 
+			// TODO
+			this.renderQuestionRender(r);
+		}
+	}
+		
 	this.surveyNew = function () {
 		this.reInit();
 		if (!this.currentQuestionID) {
@@ -136,7 +193,6 @@ var SurveyManager = function () {
 		console.warn("TODO.surveyDone", this.currentSurveyUUID);
 	}
 	this.saveQuestionState = function (q) {
-		// TODO q.ts
 		console.warn("TODO.saveQuestionState", q);
 	}
 	
@@ -157,6 +213,10 @@ var SurveyManager = function () {
 	
 	this.getSurveyLoadError = function (r) {
 		console.warn("SurveyERROR",r);
+		if (r[0]=='access_denied') {
+			this.storage.setToken("");
+			this.showLoginActivity();
+		}
 	}
 	
 }

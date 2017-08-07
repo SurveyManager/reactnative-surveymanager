@@ -43,7 +43,11 @@ const MainScreenStyles = StyleSheet.create({
 		paddingLeft: 5,
 		paddingRight: 5,
 		lineHeight: 25
+	},
+	SurveyTextBtn : {
+		padding: 10,
 	}
+
 });
 
 
@@ -60,15 +64,25 @@ class MainScreen extends React.Component {
       survey: false,
       q: []
     };
+    survey.showLoginActivity = this.showLoginActivity;
   }
   
   doLoad = function () {
 	  survey.getSurvey( function (r,e) {
-			
 			this.setState({ survey: r, q: e });
-			//this.forceUpdate();
 		  }.bind(this) );
   }
+  showLoginActivity = function () {
+		const resetAction = NavigationActions.reset({
+		index: 0,
+		actions: [
+			NavigationActions.navigate({ routeName: 'Home'})
+		]
+		})
+		this.props.navigation.dispatch(resetAction);
+
+	}
+
  
 	componentDidMount() {
 		this.doLoad();
