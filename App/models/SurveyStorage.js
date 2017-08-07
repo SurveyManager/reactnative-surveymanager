@@ -2,6 +2,8 @@
 
 import { AsyncStorage } from 'react-native';
 
+const suuid = require('uuid/v4');
+
 var SurveyStorage = function () {
 	this.config=false;
 	this.prefix="SurveyStorage";
@@ -13,11 +15,21 @@ var SurveyStorage = function () {
 	this.save = function (data) {
 		// save survey question result
 		data.ts = new Date().getTime()/1000;
-		return this._set(uuid.v1(),JSON.stringify(data));
+		AsyncStorage.clear();	// TODO
+		return this._set("survey:"+data.SH+":"+suuid()+":"+parseInt(data.ts),JSON.stringify(data));
 	}
 	
-	this.sync = function () {
+	this.sync = function (id) {
 		// retrive data
+		try {
+			AsyncStorage.getAllKeys().then(
+				function (v) { 
+					console.log("Alldata", v);
+				}.bind(this)
+			);
+		} catch (e) {
+			console.warn("syncERROR", error);
+		}
 	}
 	
 	this.setToken = function (token) {
@@ -47,8 +59,6 @@ var SurveyStorage = function () {
 	
 	this._get = function (key) {
 		try {
-			//console.log("SS-get", this.prefix+":"+key);
-			//AsyncStorage.getItem(this.prefix+":"+key).then( function (_callback, key, value) { _callback(key,value); }.bind(null, _callback, key, value ); ).done();
 			return AsyncStorage.getItem(this.prefix+":"+key);
 		} catch (error) {
 			console.warn("getERROR", error);

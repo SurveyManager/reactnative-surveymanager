@@ -36,7 +36,7 @@ const MainScreenStyles = StyleSheet.create({
 		paddingLeft: 5,
 		paddingRight: 5,
 	},
-	articleDescription: {
+	surveyDescription: {
 		fontSize: 15,
 		paddingTop: 10,
 		paddingBottom: 5,
@@ -62,14 +62,15 @@ class MainScreen extends React.Component {
     super();
     this.state = {
       survey: false,
-      q: []
+      q: [],
+      qother: []
     };
     survey.showLoginActivity = this.showLoginActivity;
   }
   
   doLoad = function () {
-	  survey.getSurvey( function (r,e) {
-			this.setState({ survey: r, q: e });
+	  survey.getSurvey( function (r,e, other) {
+			this.setState({ survey: r, q: e, qother: other});
 		  }.bind(this) );
   }
   showLoginActivity = function () {
@@ -95,6 +96,7 @@ class MainScreen extends React.Component {
 		<ScrollView>
 			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 			{ this.state.q }
+			{ this.state.qother }
 		</ScrollView>
       </View>
     );

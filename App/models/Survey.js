@@ -22,13 +22,16 @@ const SurveyStyles = StyleSheet.create({
 	
 	activeOpionStyle : {
 		backgroundColor: '#00ff00',	// TODO better color
-		padding: 20
+		borderRadius: 5,
+		padding: 20,
+		margin: 5
 	},
 	opionStyle : {
 		backgroundColor: '#ff0000',
-		padding: 20
+		borderRadius: 5,
+		padding: 20,
+		margin: 5
 	}
-
 });
 
 
@@ -141,8 +144,8 @@ var SurveyManager = function () {
 		return this.questionFormState.o[id];
 	}
 	
-	this.renderQuestionRender = function (r) {
-		this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r);
+	this.renderQuestionRender = function (r,rother) {
+		this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r, rother);
 	}
 	
 	this.renderQuestion = function (doreinit) {
@@ -152,11 +155,14 @@ var SurveyManager = function () {
 			this.questionFormState.QH = quuid();
 			this.questionFormState.qid = this.currentQuestion.id;
 			this.questionFormState.o = {};
+			this.questionFormState.t = "";
+			this.questionFormState.type = this.currentQuestion.type;
 		}
 		if (this.getSurveyCallback) {
-			let r = (<View></View>);
-			// TODO not maintainable!!!
+			let r = (<View>Unknown question type</View>);
+			let rother = (<View></View>);
 			if (this.currentQuestion.type=='text') {
+				this.questionFormState.o = false;
 				r = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
 			} else if (this.currentQuestion.type=='one' || this.currentQuestion.type=='multi') {
 				this.currentQuestionOptionsObj = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
@@ -170,9 +176,11 @@ var SurveyManager = function () {
 				} else {
 					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, false) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
 				}
+				if (this.currentQuestion.other==1) {
+					rother = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} placeholder="Other variant" autoCorrect={false} /></View>);
+				}
 			} 
-			// TODO
-			this.renderQuestionRender(r);
+			this.renderQuestionRender(r, rother);
 		}
 	}
 		
@@ -188,12 +196,26 @@ var SurveyManager = function () {
 	
 	this.surveyDone = function () {
 		this.surveyStarted = false;
-		let r = (<View><Text>Survey Done</Text></View>);
-		this.getSurveyCallback({ title: '', description: ''}, r);
+		let r = (<View></View>);
+		this.getSurveyCallback({ title: 'Done', description: 'Survey finished'}, r);
 		console.warn("TODO.surveyDone", this.currentSurveyUUID);
+		
+		console.log(this.storage.sync());
 	}
 	this.saveQuestionState = function (q) {
-		console.warn("TODO.saveQuestionState", q);
+		if (q.type=='one' || q.type=='multi') {
+			var tmp=[];
+			if (q.t=='' || q.type=='multi') {
+				for (var i in q.o) {
+					if (q.o[i]) tmp.push(i);
+				}
+				q.o = tmp;
+			} else {
+				q.o = 0;
+			}
+		}
+		//console.warn("TODO.saveQuestionState", q);
+		this.storage.save(q);
 	}
 	
 	this.rebuildKeys = function () {
