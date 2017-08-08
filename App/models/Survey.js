@@ -129,19 +129,19 @@ var SurveyManager = function () {
 	
 	this.questionFormStateOption = function (id, is_one) {
 		if (is_one) {
-			this.questionFormState.o = {};
+			this.questionFormState.oid = {};
 		}
-		if (this.questionFormState.o[id]) {
-			this.questionFormState.o[id]=false;
+		if (this.questionFormState.oid[id]) {
+			this.questionFormState.oid[id]=false;
 		} else {
-			this.questionFormState.o[id]=true;
+			this.questionFormState.oid[id]=true;
 		}
 		
 		this.renderQuestion(true);
 	}
 	
 	this.questionFormStateGet = function (id) {
-		return this.questionFormState.o[id];
+		return this.questionFormState.oid[id];
 	}
 	
 	this.renderQuestionRender = function (r,rother) {
@@ -154,7 +154,7 @@ var SurveyManager = function () {
 			this.questionFormState.SH = this.currentSurveyUUID;
 			this.questionFormState.QH = quuid();
 			this.questionFormState.qid = this.currentQuestion.id;
-			this.questionFormState.o = {};
+			this.questionFormState.oid = {};
 			this.questionFormState.t = "";
 			this.questionFormState.type = this.currentQuestion.type;
 		}
@@ -162,13 +162,13 @@ var SurveyManager = function () {
 			let r = (<View>Unknown question type</View>);
 			let rother = (<View></View>);
 			if (this.currentQuestion.type=='text') {
-				this.questionFormState.o = false;
+				this.questionFormState.oid = 0;
 				r = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
 			} else if (this.currentQuestion.type=='one' || this.currentQuestion.type=='multi') {
 				this.currentQuestionOptionsObj = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 				var tmp = this.currentQuestion.options;
 				for (var i in tmp) {
-					if (tmp[i].id) { tmp[i].state=this.questionFormState.o[(tmp[i].id)]?true:false; }
+					if (tmp[i].id) { tmp[i].state=this.questionFormState.oid[(tmp[i].id)]?true:false; }
 				}
 				this.currentQuestionOptions = this.currentQuestionOptionsObj.cloneWithRows(tmp);
 				if (this.currentQuestion.type=='one') {
@@ -203,19 +203,39 @@ var SurveyManager = function () {
 		console.log(this.storage.sync());
 	}
 	this.saveQuestionState = function (q) {
+		// preprocessing
 		if (q.type=='one' || q.type=='multi') {
-			var tmp=[];
-			if (q.t=='' || q.type=='multi') {
-				for (var i in q.o) {
-					if (q.o[i]) tmp.push(i);
+			if (q.t!='' && q.type=='one') {
+				q.oid=0;
+				this.storage.save(q);
+			} else if (q.t=='' && q.type=='one') {
+				for (var i in q.oid) {
+					if (q.oid[i]==true) {
+						q.oid=i;
+						break;
+					}
 				}
-				q.o = tmp;
-			} else {
-				q.o = 0;
+				this.storage.save(q);
+			} else if (q.type=='multi') {
+				for (var i in q.oid) {
+					var tmp = Object.assign({}, q);
+					if (q.oid[i]===true) {
+						tmp.QH = quuid();
+						tmp.oid=i;
+						tmp.t='';
+						this.storage.save(tmp);
+					}
+				}
+				if (q.t!='') {
+					var tmp = q;
+					tmp.QH = quuid();
+					tmp.oid=0;
+					this.storage.save(tmp);
+				}
 			}
+		} else {
+			this.storage.save(q);
 		}
-		//console.warn("TODO.saveQuestionState", q);
-		this.storage.save(q);
 	}
 	
 	this.rebuildKeys = function () {

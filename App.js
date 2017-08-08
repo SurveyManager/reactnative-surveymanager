@@ -46,8 +46,8 @@ newSurvey = function () {
 }
 
 clearDB = function () {
-	//Sstorage._clearAll();
-	Sstorage.sync('eba86247-5bfd-43d9-a78d-18089348fc9f');
+	Sstorage._clearAll();
+	//Sstorage.sync('eba86247-5bfd-43d9-a78d-18089348fc9f');
 }
 
 

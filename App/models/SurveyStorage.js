@@ -15,7 +15,8 @@ var SurveyStorage = function () {
 	this.save = function (data) {
 		// save survey question result
 		data.ts = new Date().getTime()/1000;
-		return this._set("survey:"+data.SH+":"+suuid()+":"+parseInt(data.ts),JSON.stringify(data));
+		console.log("SAVE", data);
+		return this._set("data:"+data.SH+":"+data.QH+":"+parseInt(data.ts),JSON.stringify(data));
 	}
 	
 	this._clearAll = function () {
@@ -32,21 +33,23 @@ var SurveyStorage = function () {
 			AsyncStorage.getAllKeys(function (id, err, keys) {
 				AsyncStorage.multiGet(keys, function (id, err, stores) {
 					stores.map(function (id, result, i, store) {
-						if (!id || store[i][0].indexOf("survey:"+id+":")!=-1) {
-							console.log("SYNC ",i," id=",store[i][0]," data=",store[i][1]);
-							var tmp =JSON.parse(store[i][1]);
-							if (tmp.type=='multi') {
-								tmp.oid=tmp.o.join("_");
+						if ((!id &&  store[i][0].indexOf(":data:")!=-1) || store[i][0].indexOf(":data:"+id+":")!=-1) {
+							//console.log("SYNC ",i," id=",store[i][0]," data=",store[i][1]);
+							try {
+								var tmp = JSON.parse(store[i][1]);
+								if (tmp.SH && tmp.QH) {
+									delete tmp.type;
+									//console.log("so send", tmp);
+									restapi.doSave(tmp, 
+										function(k, r) { 
+											this._syncElementSuccess(k, r); }.bind(this,store[i][0]), 
+										function(k, r) { 
+											this._syncElementError(k, r); }.bind(this,store[i][0])
+										);
+								}
+							} catch (e) {
+								console.log("CATCH error", e);
 							}
-							delete tmp.o;
-							delete tmp.type;
-							restapi.doSave(tmp, 
-								function(k, r) { 
-									this._syncElementSuccess(k, r); }.bind(this,store[i][0]), 
-								function(k, r) { 
-									this._syncElementError(k, r); }.bind(this,store[i][0])
-								);
-
 						} else {
 							//console.log("---- ",i," id=",store[i][0]," data=",store[i][1]);
 						}
@@ -59,7 +62,8 @@ var SurveyStorage = function () {
 	}
 	
 	this._syncElementSuccess = function (k,r) {
-		console.log("SYNC-success", k, r);
+		//console.log("SYNC-success", k, r);
+		this._remove(k);
 	}
 	
 	this._syncElementError = function (k,r) {
@@ -81,9 +85,21 @@ var SurveyStorage = function () {
 		return this._get("survey");
 	}
 	
+	this._remove = function (key) {
+		if (key.indexOf(this.prefix)!=0) {
+			key=this.prefix+key;
+		}
+		try {
+			AsyncStorage.removeItem(key);
+			return true;
+		} catch (error) {
+			console.warn("removeERROR", error);
+		}
+	}
+	
 	this._set = function (key, value) {
 		try {
-			console.log("SS-set", this.prefix+":"+key, value);
+			//console.log("SS-set", this.prefix+":"+key, value);
 			AsyncStorage.setItem(this.prefix+":"+key, value);
 			return true;
 		} catch (error) {
