@@ -15,21 +15,55 @@ var SurveyStorage = function () {
 	this.save = function (data) {
 		// save survey question result
 		data.ts = new Date().getTime()/1000;
-		AsyncStorage.clear();	// TODO
 		return this._set("survey:"+data.SH+":"+suuid()+":"+parseInt(data.ts),JSON.stringify(data));
+	}
+	
+	this._clearAll = function () {
+		try {
+			AsyncStorage.clear();
+		} catch (e) {
+			console.warn("clearERROR", error);
+		}
 	}
 	
 	this.sync = function (id) {
 		// retrive data
 		try {
-			AsyncStorage.getAllKeys().then(
-				function (v) { 
-					console.log("Alldata", v);
-				}.bind(this)
-			);
+			AsyncStorage.getAllKeys(function (id, err, keys) {
+				AsyncStorage.multiGet(keys, function (id, err, stores) {
+					stores.map(function (id, result, i, store) {
+						if (!id || store[i][0].indexOf("survey:"+id+":")!=-1) {
+							console.log("SYNC ",i," id=",store[i][0]," data=",store[i][1]);
+							var tmp =JSON.parse(store[i][1]);
+							if (tmp.type=='multi') {
+								tmp.oid=tmp.o.join("_");
+							}
+							delete tmp.o;
+							delete tmp.type;
+							restapi.doSave(tmp, 
+								function(k, r) { 
+									this._syncElementSuccess(k, r); }.bind(this,store[i][0]), 
+								function(k, r) { 
+									this._syncElementError(k, r); }.bind(this,store[i][0])
+								);
+
+						} else {
+							//console.log("---- ",i," id=",store[i][0]," data=",store[i][1]);
+						}
+					}.bind(this,id))
+				}.bind(this,id))
+			}.bind(this,id))
 		} catch (e) {
 			console.warn("syncERROR", error);
 		}
+	}
+	
+	this._syncElementSuccess = function (k,r) {
+		console.log("SYNC-success", k, r);
+	}
+	
+	this._syncElementError = function (k,r) {
+		console.log("SYNC-failed", k, r);
 	}
 	
 	this.setToken = function (token) {

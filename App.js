@@ -45,6 +45,11 @@ newSurvey = function () {
 	survey.surveyNew();
 }
 
+clearDB = function () {
+	//Sstorage._clearAll();
+	Sstorage.sync('eba86247-5bfd-43d9-a78d-18089348fc9f');
+}
+
 
 export default class App extends React.Component {
 

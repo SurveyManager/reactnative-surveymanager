@@ -14,9 +14,9 @@ import l18n from '../localization/MainScreen.js';
 const MainScreenStyles = StyleSheet.create({
 	NavView: {
 		flexDirection: 'row', 
-		width: 140, 
+		width: 180, 
 	},
-	NavBtn: {
+	NavBtnAlert: {
 		width: 60,
 		margin: 5, 
 		padding: 10, 
@@ -25,9 +25,22 @@ const MainScreenStyles = StyleSheet.create({
 		borderColor: '#d6d7da', 
 		backgroundColor: '#ff0000',
 	},
-	NavBtnTxt: {
+	NavBtnTxtAlert: {
 		textAlign: 'center',
 		color: '#ffffff'
+	},
+	NavBtn: {
+		width: 60,
+		margin: 5, 
+		padding: 10, 
+		borderRadius: 4, 
+		borderWidth: 0.5, 
+		borderColor: '#00aa00', 
+		backgroundColor: '#00ff00',
+	},
+	NavBtnTxt: {
+		textAlign: 'center',
+		color: '#000000'
 	},
 	surveyTitle: {
 		fontSize: 20,
@@ -54,7 +67,7 @@ const MainScreenStyles = StyleSheet.create({
 class MainScreen extends React.Component {
   static navigationOptions = {
     title: l18n.htitle,
-    headerRight: ( <View style={MainScreenStyles.NavView}><TouchableOpacity onPress={() => this.newSurvey()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>New</Text></TouchableOpacity><TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>Next</Text></TouchableOpacity></View> )
+    headerRight: ( <View style={MainScreenStyles.NavView}><TouchableOpacity onPress={() => this.clearDB()} style={MainScreenStyles.NavBtnAlert}><Text style={MainScreenStyles.NavBtnTxtAlert}>DBG</Text></TouchableOpacity><TouchableOpacity onPress={() => this.newSurvey()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>New</Text></TouchableOpacity><TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtn}><Text style={MainScreenStyles.NavBtnTxt}>Next</Text></TouchableOpacity></View> )
   };
 
   
