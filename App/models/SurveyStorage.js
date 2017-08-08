@@ -27,24 +27,25 @@ var SurveyStorage = function () {
 		}
 	}
 	
-	this.sync = function (id) {
+	this.sync = function (id,_callbackSuccess, _callbackFailed) {
 		// retrive data
 		try {
-			AsyncStorage.getAllKeys(function (id, err, keys) {
-				AsyncStorage.multiGet(keys, function (id, err, stores) {
-					stores.map(function (id, result, i, store) {
+			AsyncStorage.getAllKeys(function (id, _callbackSuccess, _callbackFailed, err, keys) {
+				AsyncStorage.multiGet(keys, function (id, _callbackSuccess, _callbackFailed, err, stores) {
+					stores.map(function (id, _callbackSuccess, _callbackFailed, result, i, store) {
 						if ((!id &&  store[i][0].indexOf(":data:")!=-1) || store[i][0].indexOf(":data:"+id+":")!=-1) {
 							//console.log("SYNC ",i," id=",store[i][0]," data=",store[i][1]);
 							try {
+								// TODO, one by one!!!
 								var tmp = JSON.parse(store[i][1]);
 								if (tmp.SH && tmp.QH) {
 									delete tmp.type;
 									//console.log("so send", tmp);
 									restapi.doSave(tmp, 
-										function(k, r) { 
-											this._syncElementSuccess(k, r); }.bind(this,store[i][0]), 
-										function(k, r) { 
-											this._syncElementError(k, r); }.bind(this,store[i][0])
+										function(_callback, k, r) { 
+											this._syncElementSuccess(k, r,_callback); }.bind(this, _callbackSuccess,store[i][0]), 
+										function(_callback, k, r) { 
+											this._syncElementError(k, r,_callback); }.bind(this, _callbackFailed,store[i][0])
 										);
 								}
 							} catch (e) {
@@ -53,21 +54,23 @@ var SurveyStorage = function () {
 						} else {
 							//console.log("---- ",i," id=",store[i][0]," data=",store[i][1]);
 						}
-					}.bind(this,id))
-				}.bind(this,id))
-			}.bind(this,id))
+					}.bind(this,id,_callbackSuccess, _callbackFailed))
+				}.bind(this,id,_callbackSuccess, _callbackFailed))
+			}.bind(this,id,_callbackSuccess, _callbackFailed))
 		} catch (e) {
 			console.warn("syncERROR", error);
 		}
 	}
 	
-	this._syncElementSuccess = function (k,r) {
+	this._syncElementSuccess = function (k,r,_callbackSuccess, _callbackFailed) {
 		//console.log("SYNC-success", k, r);
 		this._remove(k);
+		_callback(r);
 	}
 	
-	this._syncElementError = function (k,r) {
+	this._syncElementError = function (k,r,_callback) {
 		console.log("SYNC-failed", k, r);
+		_callback(r);
 	}
 	
 	this.setToken = function (token) {

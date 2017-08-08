@@ -43,6 +43,7 @@ var restapi = function () {
 				_callbackFailed(r['e']);
 			}
 		} catch (e) {
+			console.log("RAW",raw);
 			_callbackFailed(["internal_parse_error"]);
 		}
 	}
@@ -61,6 +62,7 @@ var restapi = function () {
 				_callbackFailed(r['e']);
 			}
 		} catch (e) {
+			console.log("RAW",raw);
 			_callbackFailed(["internal_parse_error"]);
 		}
 	}

@@ -78,7 +78,7 @@ class MainScreen extends React.Component {
       q: [],
       qother: []
     };
-    survey.showLoginActivity = this.showLoginActivity;
+    //mainActivityNav=this.props.navigation;
   }
   
   doLoad = function () {
@@ -86,17 +86,6 @@ class MainScreen extends React.Component {
 			this.setState({ survey: r, q: e, qother: other});
 		  }.bind(this) );
   }
-  showLoginActivity = function () {
-		const resetAction = NavigationActions.reset({
-		index: 0,
-		actions: [
-			NavigationActions.navigate({ routeName: 'Home'})
-		]
-		})
-		this.props.navigation.dispatch(resetAction);
-
-	}
-
  
 	componentDidMount() {
 		this.doLoad();
@@ -106,6 +95,7 @@ class MainScreen extends React.Component {
 	const { navigate } = this.props.navigation;
     return (
       <View>
+      <Button title="Modal" onPress={() => switchToLoginActivity()} />
 		<ScrollView>
 			<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 			{ this.state.q }

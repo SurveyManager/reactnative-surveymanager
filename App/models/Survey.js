@@ -49,7 +49,6 @@ var SurveyManager = function () {
 	this.currentQuestionsNum = 0;
 	this.questionFormState = {};
 	this.surveyStarted = false;
-	this.showLoginActivity = false;
 	this.currentQuestionOptions = false;
 	this.currentQuestionOptionsObj = false;
 	
@@ -63,6 +62,10 @@ var SurveyManager = function () {
 		this.currentQuestion = false;
 		this.currentQuestionID = false;
 		this.currentQuestionsNum = 0;
+	}
+		
+	this.networkState = function () {
+		return this.network;
 	}
 	
 	this.networkChange = function (n) {
@@ -198,9 +201,11 @@ var SurveyManager = function () {
 		this.surveyStarted = false;
 		let r = (<View></View>);
 		this.getSurveyCallback({ title: 'Done', description: 'Survey finished'}, r);
-		console.warn("TODO.surveyDone", this.currentSurveyUUID);
-		
-		console.log(this.storage.sync());
+		if (this.networkState()) {
+			this.storage.sync('', 
+				function (s) { console.log("survey-sync-success"); }.bind(this), 
+				function (e) { this.getSurveyLoadError(e); }.bind(this))
+		}
 	}
 	this.saveQuestionState = function (q) {
 		// preprocessing
@@ -246,7 +251,7 @@ var SurveyManager = function () {
 	}
 	
 	this.getSurveyLoadSuccess = function (v) {
-		console.log("Survey",v);
+		//console.log("Survey",v);
 		this.storage.setSurvey(JSON.stringify(v));
 		this.survey = v;
 		this.rebuildKeys();
@@ -257,7 +262,10 @@ var SurveyManager = function () {
 		console.warn("SurveyERROR",r);
 		if (r[0]=='access_denied') {
 			this.storage.setToken("");
-			this.showLoginActivity();
+			switchToLoginActivity(r[0]);
+		} else if (r[0]=='no_survey_in_cache' || r[0]=='internal_parse_error') {
+			this.storage.setToken("");
+			switchToLoginActivity(r[0]);
 		}
 	}
 	
