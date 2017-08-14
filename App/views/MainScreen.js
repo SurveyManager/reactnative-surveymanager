@@ -78,17 +78,18 @@ class MainScreen extends React.Component {
       q: [],
       qother: []
     };
-    //mainActivityNav=this.props.navigation;
+    //mainActivity=this;
   }
   
   doLoad = function () {
+	  console.warn("doLoad");
 	  survey.getSurvey( function (r,e, other) {
 			this.setState({ survey: r, q: e, qother: other});
 		  }.bind(this) );
   }
  
 	componentDidMount() {
-		this.doLoad();
+		//this.doLoad();
 	} 
 
   render() {

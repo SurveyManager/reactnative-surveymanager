@@ -43,7 +43,7 @@ var restapi = function () {
 				_callbackFailed(r['e']);
 			}
 		} catch (e) {
-			console.log("RAW",raw);
+			console.log("RAW", e, e.stack, raw);
 			_callbackFailed(["internal_parse_error"]);
 		}
 	}
@@ -82,7 +82,7 @@ var restapi = function () {
 	}
 	
 	this.api = function (method,args,_callback) {
-		console.warn("API", this.api_host+""+method, args);
+		//console.warn("API", this.api_host+""+method, args);
 		global_ajax.send(this.api_host+""+method,"POST",args,null,true,_callback);
 	}
 }

@@ -40,12 +40,12 @@ var SurveyStorage = function () {
 								var tmp = JSON.parse(store[i][1]);
 								if (tmp.SH && tmp.QH) {
 									delete tmp.type;
-									//console.log("so send", tmp);
+									console.log("so send", tmp);
 									restapi.doSave(tmp, 
-										function(_callback, k, r) { 
-											this._syncElementSuccess(k, r,_callback); }.bind(this, _callbackSuccess,store[i][0]), 
-										function(_callback, k, r) { 
-											this._syncElementError(k, r,_callback); }.bind(this, _callbackFailed,store[i][0])
+										function(_callbackSuccess, k, r) { 
+											this._syncElementSuccess(k, r,_callbackSuccess); }.bind(this, _callbackSuccess,store[i][0]), 
+										function(_callbackFailed, k, r) { 
+											this._syncElementError(k, r,_callbackFailed); }.bind(this, _callbackFailed,store[i][0])
 										);
 								}
 							} catch (e) {
@@ -58,19 +58,19 @@ var SurveyStorage = function () {
 				}.bind(this,id,_callbackSuccess, _callbackFailed))
 			}.bind(this,id,_callbackSuccess, _callbackFailed))
 		} catch (e) {
-			console.warn("syncERROR", error);
+			console.warn("syncERROR", e, error);
 		}
 	}
 	
-	this._syncElementSuccess = function (k,r,_callbackSuccess, _callbackFailed) {
+	this._syncElementSuccess = function (k,r,_callbackS) {
 		//console.log("SYNC-success", k, r);
 		this._remove(k);
-		_callback(r);
+		_callbackS(r);
 	}
 	
-	this._syncElementError = function (k,r,_callback) {
+	this._syncElementError = function (k,r,_callbackE) {
 		console.log("SYNC-failed", k, r);
-		_callback(r);
+		_callbackE(r);
 	}
 	
 	this.setToken = function (token) {

@@ -69,7 +69,7 @@ var SurveyManager = function () {
 	}
 	
 	this.networkChange = function (n) {
-		console.warn("SurveyManager [network]", n);
+		//console.warn("SurveyManager [network]", n);
 		if (n=='NONE') { 
 			this.network=false; 
 		} else { 
@@ -204,7 +204,7 @@ var SurveyManager = function () {
 		if (this.networkState()) {
 			this.storage.sync('', 
 				function (s) { console.log("survey-sync-success"); }.bind(this), 
-				function (e) { this.getSurveyLoadError(e); }.bind(this))
+				function (e) { this.getSurveyLoadError(e); }.bind(this));
 		}
 	}
 	this.saveQuestionState = function (q) {
