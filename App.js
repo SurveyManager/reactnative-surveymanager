@@ -12,7 +12,10 @@ import {
 	ScrollView,
 	TouchableOpacity,
 	Text, 
-	TextInput, } from 'react-native';
+	TextInput,
+	StatusBar, 
+	DrawerLayoutAndroid } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Color from 'react-native-material-color';
 import { Constants } from 'expo';
 import l18n from './App/localization/all.js';
@@ -156,8 +159,10 @@ hideNewSurvey = function () {
 	ModalMenu(d) {
 		if (d=='show') {
 			this.setState({ modalMenu: true, });
+			this.menudrawer.openDrawer();
 		} else {
 			this.setState({ modalMenu: false, });
+			this.menudrawer.closeDrawer();
 		}
 	}
 	Logout() {
@@ -168,8 +173,30 @@ hideNewSurvey = function () {
 
 
   render() {
+	  var navigationView = (<View style={AppStyle.MenuModalInner}>
+				<TouchableOpacity onPress={() => clearDB()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>Clear DB</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.newsurvey}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.summary()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.summary}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.logout}</Text>
+				</TouchableOpacity></View>);
     return (
-      <View>
+       <DrawerLayoutAndroid
+      drawerWidth={300}
+      ref={(_menudrawer) => this.menudrawer = _menudrawer}
+      drawerPosition={DrawerLayoutAndroid.positions.Left}
+      renderNavigationView={() => navigationView}>
+      <View style={AppStyle.Main}>
+      <StatusBar
+		backgroundColor={Color.LightGreen}
+		barStyle="dark-content"
+		/>
          <Modal
           animationType={"fade"}
           transparent={true}
@@ -180,7 +207,7 @@ hideNewSurvey = function () {
           <View style={AppStyle.modal}>
           <View style={AppStyle.modalInner}>
             <Text style={AppStyle.modalTxt}>{this.state.modalTxt}</Text>
-            <Button style={AppStyle.modalButton} onPress={() => { _goLoginActivity() }} title="OK" />
+            <Button style={AppStyle.modalButton} onPress={() => { _goLoginActivity() }} title={l18n.ok} />
           </View></View>
         </Modal>
          <Modal
@@ -209,7 +236,7 @@ hideNewSurvey = function () {
           >
           <View style={AppStyle.modal}>
 			<View style={AppStyle.modalInner}>
-				<Text style={AppStyle.modalTxt}>Loading. Please wait...</Text>
+				<Text style={AppStyle.modalTxt}>{l18n.loading}</Text>
 			</View>
           </View>
         </Modal>
@@ -222,47 +249,30 @@ hideNewSurvey = function () {
           >
           <View style={AppStyle.modal}>
 			<View style={AppStyle.modalInner}>
-				<Text style={AppStyle.modalTxt}>Start new survey?</Text>
-				<Button style={AppStyle.modalButton} onPress={() => { this.doNewSurvey() }} title="Start" />
-				<Button style={AppStyle.modalButton} onPress={() => { this.hideNewSurvey() }} title="Cancel" />
-			</View>
-          </View>
-        </Modal>
-         <Modal style={AppStyle.MenuModal}
-          animationType={"slide"}
-          transparent={false}
-          presentationStyle={"fullScreen"}
-          visible={this.state.modalMenu}
-          onRequestClose={() => { this.ModalMenu('hide') }}
-          >
-          <View style={AppStyle.MenuModal}>
-			<View style={AppStyle.MenuModalInner}>
-				<TouchableOpacity onPress={() => this.ModalMenu('hide') } style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>Hide menu modal</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => clearDB()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>Clear DB</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>New survey</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>Logout</Text>
-				</TouchableOpacity>
+				<Text style={AppStyle.modalTxt}>{l18n.startnew}</Text>
+				<View style={AppStyle.modalButtons}>
+					<TouchableOpacity onPress={() => this.doNewSurvey() } style={MainScreenStyles.NavBtn}>
+						<Text style={MainScreenStyles.NavBtnTxtAlert}>{l18n.start}</Text>
+					</TouchableOpacity>
+					<TouchableOpacity onPress={() => this.hideNewSurvey() } style={MainScreenStyles.NavBtn}>
+						<Text style={MainScreenStyles.NavBtnTxt}>{l18n.cancel}</Text>
+					</TouchableOpacity>
+				</View>			
 			</View>
           </View>
         </Modal>
         {renderIf(this.state.mainVisible)(
 		<View style={MainScreenStyles.MainView}>
 			<View style={MainScreenStyles.NavView}>
-				<TouchableOpacity onPress={() => this.ModalMenu('show')} style={MainScreenStyles.NavBtnAlert}>
-					<Text style={MainScreenStyles.NavBtnTxtAlert}>Menu</Text>
+				<TouchableOpacity onPress={() => this.ModalMenu('show')} style={MainScreenStyles.NavBtnMenu}>
+					<Ionicons name="md-menu" size={32} color="black" />
 				</TouchableOpacity>
+				<Text style={MainScreenStyles.NavTitle}>{this.state.survey.title}</Text>
 				<TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtnNext}>
-					<Text style={MainScreenStyles.NavBtnTxt}>Next</Text>
+					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
 				</TouchableOpacity>
 			</View>
-			<ScrollView>
+			<ScrollView style={MainScreenStyles.ScrollView}>
 				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 				{ this.state.q }
 				{ this.state.qother }
@@ -271,6 +281,7 @@ hideNewSurvey = function () {
 		)}
 
       </View>
+      </DrawerLayoutAndroid>
     );
   }
 }
@@ -288,11 +299,39 @@ const LoginScreenStyles = StyleSheet.create({
 const MainScreenStyles = StyleSheet.create({
 	MainView: {
 		paddingTop: Constants.statusBarHeight,
-		width: Dimensions.get('window').width
+		width: Dimensions.get('window').width,
+		height: Dimensions.get('window').height,
+		backgroundColor: Color.Black,
+	},
+	ScrollView: {
+		backgroundColor: Color.White,
 	},
 	NavView: {
 		flexDirection: 'row', 
-		width: 180, 
+		width: Dimensions.get('window').width, 
+		backgroundColor: Color.LightGreen,
+		shadowColor: '#000',
+		shadowOffset: { width: 2, height: 2 },
+		shadowOpacity: 0.8,
+		shadowRadius: 2,
+		elevation: 5,
+	},
+	NavTitle: {
+		color: Color.White,
+		fontSize: 20,
+		paddingTop:15, 
+	},
+	NavBtnMenu: {
+		width: 60,
+		margin: 5, 
+		padding: 10, 
+		backgroundColor: Color.Transparent,
+	},
+	NavBtnMenuModal: {
+		width: 60,
+		margin: 5, 
+		padding: 5, 
+		backgroundColor: Color.Transparent,
 	},
 	NavBtnAlert: {
 		width: 60,
@@ -305,44 +344,43 @@ const MainScreenStyles = StyleSheet.create({
 	},
 	NavBtnTxtAlert: {
 		textAlign: 'center',
-		color: '#ffffff'
+		color: Color.White
 	},
 	NavBtn: {
-		width: 60,
-		margin: 5, 
-		padding: 10, 
-		borderRadius: 4, 
-		borderWidth: 0.5, 
-		borderColor: Color.Green[900], 
-		backgroundColor: Color.Green,
-	},
-	NavBtnNext: {
 		width: 100,
 		margin: 5, 
 		padding: 10, 
 		borderRadius: 4, 
 		borderWidth: 0.5, 
-		borderColor: Color.Green[900], 
-		backgroundColor: Color.Green,
+		borderColor: Color.Blue[900], 
+		backgroundColor: Color.Blue,
+	},
+	NavBtnNext: {
+		position: 'absolute',
+		bottom: 15,
+		right: 10,
+		backgroundColor: Color.Transparent,
 	},
 	NavBtnTxt: {
 		textAlign: 'center',
-		color: '#000000'
+		color: Color.White
 	},
 	surveyTitle: {
 		fontSize: 20,
 		paddingTop: 5,
 		paddingBottom: 5,
-		paddingLeft: 5,
-		paddingRight: 5,
+		paddingLeft: 10,
+		paddingRight: 10,
+		color: Color.Black,
 	},
 	surveyDescription: {
 		fontSize: 15,
 		paddingTop: 10,
 		paddingBottom: 5,
-		paddingLeft: 5,
-		paddingRight: 5,
-		lineHeight: 25
+		paddingLeft: 10,
+		paddingRight: 10,
+		lineHeight: 25,
+		color: Color.Grey,
 	},
 	SurveyTextBtn : {
 		padding: 10,
@@ -352,18 +390,24 @@ const MainScreenStyles = StyleSheet.create({
 
 
 const AppStyle = StyleSheet.create({
+	Main: {
+		width: Dimensions.get('window').width,
+		height: Dimensions.get('window').height,
+		backgroundColor: Color.Black,
+	},
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
+    backgroundColor: Color.Gray,
     paddingTop: Constants.statusBarHeight,
   },
   MenuModal: {
-	  backgroundColor: '#000',
+	  backgroundColor: Color.Transparent,
   },
   MenuModalInner: {
-		backgroundColor: '#000', 
+		paddingTop: 50,
+		backgroundColor: Color.Black, 
 	},
 	MenuModalButton: {
 		padding: 5,
@@ -371,12 +415,12 @@ const AppStyle = StyleSheet.create({
 	MenuModalButtonTxt: {
 		padding: 10,
 		textAlign: 'left',
-		color: '#fff'
+		color: Color.White
 	},
 	MenuModalTxt: {
 		padding: 5,
 		textAlign: 'right',
-		color: '#fff'
+		color: Color.White
 	},
 	modal: {
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -385,9 +429,14 @@ const AppStyle = StyleSheet.create({
 		padding: 20,
 	},
 	modalInner: {
-		backgroundColor: '#fff', 
+		backgroundColor: Color.White, 
 		padding: 20,
 		borderRadius: 10,
+		alignItems: 'center',
+	},
+	modalButtons: {
+		flexDirection: 'row', 
+		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	modalButton: {

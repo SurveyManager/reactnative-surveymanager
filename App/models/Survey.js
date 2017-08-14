@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
   Button
 } from 'react-native';
+import Color from 'react-native-material-color';
+import l18n from '../localization/all.js';
 
 const suuid = require('uuid/v4');
 const quuid = require('uuid/v1');
@@ -20,17 +22,49 @@ const SurveyStyles = StyleSheet.create({
 		padding: 10,
 	},
 	
-	activeOpionStyle : {
-		backgroundColor: '#00ff00',	// TODO better color
+	otherText: {
+		padding: 20,
+		margin: 5,
+		color: Color.Black,
+		borderColor: Color.BlueGrey, 
 		borderRadius: 5,
+		borderWidth: 0.5, 
+	},
+	
+	activeOpionStyle : {
+		backgroundColor: Color.BlueGrey,
+		borderColor: Color.BlueGrey, 
+		borderRadius: 5,
+		borderWidth: 0.5, 
+		color: Color.White,
 		padding: 20,
 		margin: 5
 	},
 	opionStyle : {
-		backgroundColor: '#ff0000',
+		backgroundColor: Color.White,
+		borderColor: Color.BlueGrey, 
+		color: Color.Black,
+		borderWidth: 0.5, 
 		borderRadius: 5,
 		padding: 20,
 		margin: 5
+	},
+	tips: {
+		padding: 20,
+		marginTop: 20,
+		color: Color.BlueGrey,
+	},
+	button: {
+		borderWidth: 0.5, 
+		borderRadius: 5,
+		padding: 20,
+		margin: 5,
+		width: 200, 
+		fontSize: 20, 
+		textAlign: 'center',
+		backgroundColor: Color.LightGreen,
+		color: Color.White,
+		
 	}
 });
 
@@ -109,7 +143,7 @@ var SurveyManager = function () {
 	}
 	this.renderSurveyInfo = function () {
 		if (this.getSurveyCallback) {
-			let start = (<View><Button onPress={() => this.pressCallback('start','')} title="Start survey"/></View>);
+			let start = (<View style={{ flex: 1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center', marginTop:30 }}><TouchableOpacity onPress={ () => this.pressCallback('start','')}><Text style={SurveyStyles.button}>{l18n.startsurvey}</Text></TouchableOpacity></View>);
 			this.getSurveyCallback({ title: this.survey.survey.title, description: this.survey.survey.Description}, start);
 		}
 	}
@@ -127,6 +161,7 @@ var SurveyManager = function () {
 			}
 		} else {
 			this.surveyNew();
+			//this.pressCallback('start',false);
 		}
 	}
 	
@@ -166,7 +201,7 @@ var SurveyManager = function () {
 			let rother = (<View></View>);
 			if (this.currentQuestion.type=='text') {
 				this.questionFormState.oid = 0;
-				r = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
+				r = (<View><TextInput style={SurveyStyles.otherText} onChangeText={(text) => this.questionFormState.t=text} autoFocus={true} returnKeyType='next' autoCorrect={false} /></View>);
 			} else if (this.currentQuestion.type=='one' || this.currentQuestion.type=='multi') {
 				this.currentQuestionOptionsObj = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 				var tmp = this.currentQuestion.options;
@@ -180,7 +215,7 @@ var SurveyManager = function () {
 					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, false) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
 				}
 				if (this.currentQuestion.other==1) {
-					rother = (<View><TextInput style={SurveyStyles.textBtn} onChangeText={(text) => this.questionFormState.t=text} placeholder="Other variant" autoCorrect={false} /></View>);
+					rother = (<View><TextInput style={SurveyStyles.otherText} onChangeText={(text) => this.questionFormState.t=text} placeholder={l18n.othervar} autoCorrect={false} /></View>);
 				}
 			} 
 			this.renderQuestionRender(r, rother);
@@ -199,7 +234,7 @@ var SurveyManager = function () {
 	
 	this.surveyDone = function () {
 		this.surveyStarted = false;
-		let r = (<View></View>);
+		let r = (<View style={{ flex: 1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center', marginTop:30 }}><TouchableOpacity onPress={ () => this.nextQuestion() }><Text style={SurveyStyles.button}>{l18n.newsurvey}</Text></TouchableOpacity></View>);
 		this.getSurveyCallback({ title: 'Done', description: 'Survey finished'}, r);
 		if (this.networkState()) {
 			this.storage.sync('', 
