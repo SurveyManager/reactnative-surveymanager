@@ -11,72 +11,11 @@ import {
   TouchableOpacity,
   Button
 } from 'react-native';
-import Color from 'react-native-material-color';
 import l18n from '../localization/all.js';
+import SurveyStyles from '../styles/SurveyStyles.js'
 
 const suuid = require('uuid/v4');
 const quuid = require('uuid/v1');
-
-const SurveyStyles = StyleSheet.create({
-	textBtn : {
-		padding: 10,
-	},
-	
-	otherText: {
-		padding: 20,
-		margin: 10,
-		color: Color.Black,
-		borderColor: Color.BlueGrey, 
-		borderRadius: 5,
-		borderWidth: 0.5, 
-	},
-	activeOtherText: {
-		padding: 20,
-		margin: 10,
-		color: Color.White,
-		backgroundColor: Color.BlueGrey,
-		borderColor: Color.BlueGrey, 
-		borderRadius: 5,
-		borderWidth: 0.5, 
-	},
-	
-	activeOpionStyle : {
-		backgroundColor: Color.BlueGrey,
-		borderColor: Color.BlueGrey, 
-		borderRadius: 5,
-		borderWidth: 0.5, 
-		color: Color.White,
-		padding: 20,
-		margin: 10
-	},
-	opionStyle : {
-		backgroundColor: Color.White,
-		borderColor: Color.BlueGrey, 
-		color: Color.Black,
-		borderWidth: 0.5, 
-		borderRadius: 5,
-		padding: 20,
-		margin: 10
-	},
-	tips: {
-		padding: 20,
-		marginTop: 20,
-		color: Color.BlueGrey,
-	},
-	button: {
-		borderWidth: 0.5, 
-		borderRadius: 5,
-		padding: 20,
-		margin: 5,
-		width: 200, 
-		fontSize: 20, 
-		textAlign: 'center',
-		backgroundColor: Color.LightGreen,
-		color: Color.White,
-		
-	}
-});
-
 
 var SurveyManager = function () {
 	this.config=false;

@@ -4,7 +4,6 @@ import {
 	AppRegistry, 
 	View, 
 	StyleSheet, 
-	Dimensions, 
 	AsyncStorage, 
 	NetInfo, 
 	Modal, 
@@ -19,12 +18,11 @@ import {
 	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Color from 'react-native-material-color';
-import { Constants } from 'expo';
 import l18n from './App/localization/all.js';
+import MainScreenStyles from './App/styles/MainScreenStyles.js';
+import AppStyle from './App/styles/AppStyle.js';
 
 var thisActivity = false;
-
-//var uuid = require('react-native-uuid');
 
 var _storage = require('./App/models/SurveyStorage.js');
 	Sstorage=new _storage();
@@ -285,8 +283,8 @@ syncStatusHandlerFinish = function (s) {
           >
           <View style={AppStyle.modal}>
           <View style={AppStyle.modalInner}>        
-			<TextInput style={LoginScreenStyles.textBtn} ref="1" onChangeText={(text) => this.loginFormState.login={text} } defaultValue={this.state.email} autoFocus={true} placeholder={l18n.plogin} returnKeyType="next" autoCorrect={false} onSubmitEditing={() => this.focusNextField('2')} />
-			<TextInput style={LoginScreenStyles.textBtn} ref="2" onChangeText={(text) => this.loginFormState.password={text} } placeholder={l18n.ppassword} returnKeyType="done" secureTextEntry={true} autoCorrect={false} onSubmitEditing={() => this.doAuth()} />
+			<TextInput style={AppStyle.LoginText} ref="1" onChangeText={(text) => this.loginFormState.login={text} } defaultValue={this.state.email} autoFocus={true} placeholder={l18n.plogin} returnKeyType="next" autoCorrect={false} onSubmitEditing={() => this.focusNextField('2')} />
+			<TextInput style={AppStyle.LoginText} ref="2" onChangeText={(text) => this.loginFormState.password={text} } placeholder={l18n.ppassword} returnKeyType="done" secureTextEntry={true} autoCorrect={false} onSubmitEditing={() => this.doAuth()} />
 			<Button
 				  onPress={() => this.doAuth()}
 				  title={l18n.login}
@@ -356,197 +354,3 @@ syncStatusHandlerFinish = function (s) {
     );
   }
 }
-
-const LoginScreenStyles = StyleSheet.create({
-	container: {
-		padding: 20,
-	},
-	textBtn : {
-		width: 200,
-		padding: 10,
-	}
-});
-
-const MainScreenStyles = StyleSheet.create({
-	MainView: {
-		paddingTop: Constants.statusBarHeight,
-		width: Dimensions.get('window').width,
-		height: Dimensions.get('window').height,
-		backgroundColor: Color.Black,
-	},
-	ScrollView: {
-		backgroundColor: Color.White,
-	},
-	NavView: {
-		flexDirection: 'row', 
-		width: Dimensions.get('window').width, 
-		backgroundColor: Color.LightGreen,
-		shadowColor: '#000',
-		shadowOffset: { width: 2, height: 2 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-	},
-	NavTitle: {
-		color: Color.White,
-		fontSize: 20,
-		paddingTop:15, 
-	},
-	NavBtnMenu: {
-		width: 60,
-		margin: 5, 
-		padding: 10, 
-		backgroundColor: Color.Transparent,
-	},
-	NavBtnMenuModal: {
-		width: 60,
-		margin: 5, 
-		padding: 5, 
-		backgroundColor: Color.Transparent,
-	},
-	NavBtnAlert: {
-		width: 60,
-		margin: 5, 
-		padding: 10, 
-		borderRadius: 4, 
-		borderWidth: 0.5, 
-		borderColor: Color.Red[900], 
-		backgroundColor: Color.Red,
-	},
-	NavBtnTxtAlert: {
-		textAlign: 'center',
-		color: Color.White
-	},
-	NavBtn: {
-		width: 100,
-		margin: 5, 
-		padding: 10, 
-		borderRadius: 4, 
-		borderWidth: 0.5, 
-		borderColor: Color.Blue[900], 
-		backgroundColor: Color.Blue,
-	},
-	NavBtnNext: {
-		position: 'absolute',
-		bottom: 15,
-		right: 10,
-		backgroundColor: Color.Transparent,
-	},
-	NavSyncIcon : {
-		position: 'absolute',
-		bottom: 15,
-		right: 50,
-		backgroundColor: Color.Transparent,
-	},
-	NavBtnTxt: {
-		textAlign: 'center',
-		color: Color.White
-	},
-	surveyTitle: {
-		fontSize: 20,
-		paddingTop: 5,
-		paddingBottom: 5,
-		paddingLeft: 10,
-		paddingRight: 10,
-		color: Color.Black,
-	},
-	surveyDescription: {
-		fontSize: 15,
-		paddingTop: 10,
-		paddingBottom: 5,
-		paddingLeft: 10,
-		paddingRight: 10,
-		lineHeight: 25,
-		color: Color.Grey,
-	},
-	SurveyTextBtn : {
-		padding: 10,
-	}
-
-});
-
-
-const AppStyle = StyleSheet.create({
-	Main: {
-		width: Dimensions.get('window').width,
-		height: Dimensions.get('window').height,
-		backgroundColor: Color.Black,
-	},
-	MenuHeader: {
-		fontSize: 20,
-		paddingTop: 50,
-		paddingBottom: 50,
-		paddingLeft: 10,
-		paddingRight: 10,
-		lineHeight: 25,
-		textAlign: 'left',
-		color: Color.LightGreen,
-		backgroundColor: Color.Black, 
-		shadowColor: '#000',
-		shadowOffset: { width: 2, height: 2 },
-		shadowOpacity: 0.8,
-		shadowRadius: 2,
-		elevation: 5,
-	},
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Color.Gray,
-    paddingTop: Constants.statusBarHeight,
-  },
-  MenuModal: {
-	  backgroundColor: Color.Transparent,
-  },
-  MenuModalInner: {
-		backgroundColor: Color.White, 
-	},
-	MenuModalButton: {
-		paddingTop: 5,
-		paddingBottom: 10,
-		paddingLeft: 5,
-		paddingRight: 5,
-	},
-	MenuModalButtonLogout: {
-		paddingTop: 40,
-		paddingLeft: 5,
-		paddingRight: 5,
-		paddingBottom: 5,
-	},
-
-	MenuModalButtonTxt: {
-		padding: 10,
-		textAlign: 'left',
-		color: Color.Black
-	},
-	MenuModalTxt: {
-		padding: 5,
-		textAlign: 'right',
-		color: Color.Black
-	},
-	modal: {
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		flex: 1,
-		justifyContent: 'center',
-		padding: 20,
-	},
-	modalInner: {
-		backgroundColor: Color.White, 
-		padding: 20,
-		borderRadius: 10,
-		alignItems: 'center',
-	},
-	modalButtons: {
-		flexDirection: 'row', 
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	modalButton: {
-		margin: 10,
-		width: 100,
-	},
-	modalTxt: {
-		margin: 10,
-	},
-
-});
