@@ -40,7 +40,8 @@ var SurveyStorage = function () {
 								var tmp = JSON.parse(store[i][1]);
 								if (tmp.SH && tmp.QH) {
 									delete tmp.type;
-									console.log("so send", tmp);
+									//console.log("so send", tmp);
+									syncStatus("do");
 									restapi.doSave(tmp, 
 										function(_callbackSuccess, k, r) { 
 											this._syncElementSuccess(k, r,_callbackSuccess); }.bind(this, _callbackSuccess,store[i][0]), 
@@ -58,18 +59,20 @@ var SurveyStorage = function () {
 				}.bind(this,id,_callbackSuccess, _callbackFailed))
 			}.bind(this,id,_callbackSuccess, _callbackFailed))
 		} catch (e) {
-			console.warn("syncERROR", e, error);
+			//console.warn("syncERROR", e, error);
 		}
 	}
 	
 	this._syncElementSuccess = function (k,r,_callbackS) {
 		//console.log("SYNC-success", k, r);
+		syncStatus("success");
 		this._remove(k);
 		_callbackS(r);
 	}
 	
 	this._syncElementError = function (k,r,_callbackE) {
-		console.log("SYNC-failed", k, r);
+		//console.log("SYNC-failed", k, r);
+		syncStatus("failed");
 		_callbackE(r);
 	}
 	
@@ -79,6 +82,15 @@ var SurveyStorage = function () {
 	
 	this.getToken = function (token) {
 		return this._get("token");
+	}
+
+	this.setUser = function (userdata) {
+		//console.warn("DBG", userdata);
+		return this._set("user",userdata);
+	}
+	
+	this.getUser = function (token) {
+		return this._get("user");
 	}
 	
 	this.setSurvey = function (survey) {

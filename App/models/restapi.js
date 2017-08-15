@@ -20,7 +20,7 @@ var restapi = function () {
 			var r=JSON.parse(raw);
 			if (r['ok']) {
 				this.credentials = r['d']['tokenID'];
-				_callbackSuccess(r['d']['tokenID']);
+				_callbackSuccess(r['d']);
 			} else {
 				_callbackFailed(raw);
 			}
@@ -30,9 +30,11 @@ var restapi = function () {
 	}
 	
 	this.doSave = function (data, _callbackSuccess, _callbackFailed) {
-		var _data = {"request_id":"API_save"};
-		this.api("save",this._prepareRequest(_data, data), 
-			function (_callbackSuccess, _callbackFailed, r) { this.doSave_answer(r, _callbackSuccess, _callbackFailed)}.bind(this,_callbackSuccess, _callbackFailed));				
+		if (this.credentials) {
+			var _data = {"request_id":"API_save"};
+			this.api("save",this._prepareRequest(_data, data), 
+				function (_callbackSuccess, _callbackFailed, r) { this.doSave_answer(r, _callbackSuccess, _callbackFailed)}.bind(this,_callbackSuccess, _callbackFailed));				
+		}
 	}
 	this.doSave_answer = function(raw,_callbackSuccess, _callbackFailed) {
 		try {

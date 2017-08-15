@@ -19,7 +19,8 @@ var l18n = {
     othervar:"Other variant",
     nexttocontinue:"Press > button to continue",
     nexttostart:"Press > button to start survey",
-    summary:"Summary data"
+    summary:"Summary data",
+    syncmanual:"Sync manualy",
 
   };
 

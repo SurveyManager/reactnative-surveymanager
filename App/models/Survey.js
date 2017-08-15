@@ -108,6 +108,7 @@ var SurveyManager = function () {
 			this.network=false; 
 		} else { 
 			this.network=true; 
+			this.surveySync();
 		}
 	}
 	
@@ -236,12 +237,19 @@ var SurveyManager = function () {
 		this.surveyStarted = false;
 		let r = (<View style={{ flex: 1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center', marginTop:30 }}><TouchableOpacity onPress={ () => this.nextQuestion() }><Text style={SurveyStyles.button}>{l18n.newsurvey}</Text></TouchableOpacity></View>);
 		this.getSurveyCallback({ title: 'Done', description: 'Survey finished'}, r);
+		this.surveySync();
+	}
+	
+	this.surveySync = function () {
 		if (this.networkState()) {
+			//console.warn("Start sync");
+			syncStatus("start");
 			this.storage.sync('', 
 				function (s) { console.log("survey-sync-success"); }.bind(this), 
 				function (e) { this.getSurveyLoadError(e); }.bind(this));
 		}
 	}
+	
 	this.saveQuestionState = function (q) {
 		// preprocessing
 		if (q.type=='one' || q.type=='multi') {

@@ -20,6 +20,7 @@ import Color from 'react-native-material-color';
 import { Constants } from 'expo';
 import l18n from './App/localization/all.js';
 
+var thisActivity = false;
 
 var uuid = require('react-native-uuid');
 
@@ -44,8 +45,6 @@ NetInfo.addEventListener(
   function (survey, t) { survey.networkChange(t); }.bind(null, survey)
 );
 
-var thisActivity = false;
-
 switchToLoginActivity = function (e) {
 	  if (e) {
 		  thisActivity.setState({ modalVisible: true, mainVisible: false, modalTxt: e });
@@ -62,6 +61,13 @@ clearDB = function () {
 }
 
 
+syncStatus = function (s) {
+	if (thisActivity) {
+		thisActivity.syncStatusHandler(s);
+	}
+}
+
+
 
 export default class App extends React.Component {
 	static waitTimer = false;
@@ -74,16 +80,20 @@ export default class App extends React.Component {
 		modalProgressVisible: true,
 		modalNewSurvey: false,
 		modalMenu: false,
+		syncProgress: false, 
 		modalTxt: "",
+		email: "",
 		survey: false,
+		syncicon: "md-cloud",
 		q: [],
 		qother: []
 	}
 	thisActivity=this;
   }
+    
   loginFormState = {
-		"login": false,
-		"password": false
+		"login": {text:''},
+		"password": {text:''}
 	  }
   focusNextField = (nextField) => {
     this.refs[nextField].focus();
@@ -105,25 +115,60 @@ doNewSurvey = function () {
 hideNewSurvey = function () {
 	this.setState({ modalNewSurvey: false });
 }
+sync = function () {
+	this.ModalMenu('hide');
+	survey.surveySync();
+}
 
+syncStatusHandlerTimer = false;
+
+syncStatusHandler = function (s) {
+	if (this.syncStatusHandlerTimer) {
+		clearTimeout(this.syncStatusHandlerTimer);
+		this.syncStatusHandlerTimer=false;
+	}
+	if (s=='start' || s=='do') {
+		this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
+	} else if (s=='success') {
+		this.setState({ syncicon: "md-cloud-done", syncProgress: true } );
+	} else if (s=='failed') {
+		this.setState({ syncicon: "md-cloud-outline", syncProgress: true } );
+	}
+	this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
+}
+
+syncStatusHandlerFinish = function (s) {
+	this.setState({ syncProgress: false } );
+}
   
   doAuth = function () {
 	  this.setState({modalProgressVisible: true });
-	  restapi.doAuth(this.loginFormState.login.text, this.loginFormState.password.text, 
-		function(r) { this.doAuthSuccess(r); }.bind(this), 
-		function(r) { this.doAuthError(r); }.bind(this));
+	  //console.warn("Auth network", survey.networkState());
+	  if (survey.networkState()) {
+		  restapi.doAuth(this.loginFormState.login.text, this.loginFormState.password.text, 
+			function(r) { this.doAuthSuccess(r); }.bind(this), 
+			function(r) { this.doAuthError(r); }.bind(this));
+	  } else {
+		  this.checkUser(this.loginFormState.login.text, this.loginFormState.password.text, 
+			function() { this.doAuthSuccess(false); }.bind(this), 
+			function() { this.doAuthError(false); }.bind(this));
+	  }
   }
   doAuthSuccess = function (r) {
-	  Sstorage.setToken(r);
-	  this.doAfterAuthSuccess();
+	if (r) {
+		Sstorage.setToken(r['tokenID']);
+		Sstorage.setUser(JSON.stringify(r));
+	}
+	this.doAfterAuthSuccess();
   }
   doAfterAuthSuccess = function () {
 	  this.setState({ modalLoginVisible: false, modalProgressVisible: false });
+	  this.checkUser(false, false, false, false); 
 	  this.doLoad();
   }
   
   doAuthError = function (r) {
-	  this.setState({modalProgressVisible: false });
+	  this.setState({modalProgressVisible: false, modalVisible: true, modalTxt: "Authorization error" });
   }
   
   doLoad = function () {
@@ -142,8 +187,29 @@ hideNewSurvey = function () {
 				this.doAfterAuthSuccess();
 			} else {
 				this.setState({ modalLoginVisible: true, modalProgressVisible: false, });
+				this.checkUser(false, false, false, false); 
 			}
 		}.bind(this));
+		
+  }
+  
+  checkUser = function (login, password, _callbackSuccess, _callbackFailed) {
+		Sstorage.getUser().then( function (login, password,_callbackSuccess, _callbackFailed, v) {
+			if (v) {
+				v=JSON.parse(v);
+				this.setState({ email:v.email });
+				this.loginFormState.login.text=v.email;
+				this.loginFormState.password.text="";//v.pin;
+				if (v.email && v.PIN && v.email==login && v.PIN==password && _callbackSuccess!==false)  {
+					_callbackSuccess(false);
+				} else {
+					if (_callbackFailed!==false) _callbackFailed(false);
+				}
+			} else {
+				if (_callbackFailed!==false) _callbackSuccess(false);
+			}
+		}.bind(this, login, password,_callbackSuccess, _callbackFailed));
+
   }
   
   componentDidMount() {
@@ -174,16 +240,14 @@ hideNewSurvey = function () {
 
   render() {
 	  var navigationView = (<View style={AppStyle.MenuModalInner}>
-				<TouchableOpacity onPress={() => clearDB()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>Clear DB</Text>
-				</TouchableOpacity>
+				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.newsurvey}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.summary()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.summary}</Text>
+				<TouchableOpacity onPress={() => this.sync()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.syncmanual}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButton}>
+				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButtonLogout}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.logout}</Text>
 				</TouchableOpacity></View>);
     return (
@@ -219,8 +283,8 @@ hideNewSurvey = function () {
           >
           <View style={AppStyle.modal}>
           <View style={AppStyle.modalInner}>        
-			<TextInput style={LoginScreenStyles.textBtn} ref="1" onChangeText={(text) => this.loginFormState.login={text}} autoFocus={true} placeholder={l18n.plogin} returnKeyType="next" autoCorrect={false} onSubmitEditing={() => this.focusNextField('2')} />
-			<TextInput style={LoginScreenStyles.textBtn} ref="2" onChangeText={(text) => this.loginFormState.password={text}} placeholder={l18n.ppassword} returnKeyType="done" secureTextEntry={true} autoCorrect={false} onSubmitEditing={() => this.doAuth()} />
+			<TextInput style={LoginScreenStyles.textBtn} ref="1" onChangeText={(text) => this.loginFormState.login={text} } defaultValue={this.state.email} autoFocus={true} placeholder={l18n.plogin} returnKeyType="next" autoCorrect={false} onSubmitEditing={() => this.focusNextField('2')} />
+			<TextInput style={LoginScreenStyles.textBtn} ref="2" onChangeText={(text) => this.loginFormState.password={text} } placeholder={l18n.ppassword} returnKeyType="done" secureTextEntry={true} autoCorrect={false} onSubmitEditing={() => this.doAuth()} />
 			<Button
 				  onPress={() => this.doAuth()}
 				  title={l18n.login}
@@ -268,6 +332,9 @@ hideNewSurvey = function () {
 					<Ionicons name="md-menu" size={32} color="black" />
 				</TouchableOpacity>
 				<Text style={MainScreenStyles.NavTitle}>{this.state.survey.title}</Text>
+				{renderIf(this.state.syncProgress)(
+				<Ionicons style={MainScreenStyles.NavSyncIcon} name={this.state.syncicon} size={32} color="white" />
+				)}
 				<TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtnNext}>
 					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
 				</TouchableOpacity>
@@ -361,6 +428,12 @@ const MainScreenStyles = StyleSheet.create({
 		right: 10,
 		backgroundColor: Color.Transparent,
 	},
+	NavSyncIcon : {
+		position: 'absolute',
+		bottom: 15,
+		right: 50,
+		backgroundColor: Color.Transparent,
+	},
 	NavBtnTxt: {
 		textAlign: 'center',
 		color: Color.White
@@ -395,6 +468,22 @@ const AppStyle = StyleSheet.create({
 		height: Dimensions.get('window').height,
 		backgroundColor: Color.Black,
 	},
+	MenuHeader: {
+		fontSize: 20,
+		paddingTop: 50,
+		paddingBottom: 50,
+		paddingLeft: 10,
+		paddingRight: 10,
+		lineHeight: 25,
+		textAlign: 'left',
+		color: Color.LightGreen,
+		backgroundColor: Color.Black, 
+		shadowColor: '#000',
+		shadowOffset: { width: 2, height: 2 },
+		shadowOpacity: 0.8,
+		shadowRadius: 2,
+		elevation: 5,
+	},
   container: {
     flex: 1,
     alignItems: 'center',
@@ -406,21 +495,30 @@ const AppStyle = StyleSheet.create({
 	  backgroundColor: Color.Transparent,
   },
   MenuModalInner: {
-		paddingTop: 50,
-		backgroundColor: Color.Black, 
+		backgroundColor: Color.White, 
 	},
 	MenuModalButton: {
-		padding: 5,
+		paddingTop: 5,
+		paddingBottom: 10,
+		paddingLeft: 5,
+		paddingRight: 5,
 	},
+	MenuModalButtonLogout: {
+		paddingTop: 40,
+		paddingLeft: 5,
+		paddingRight: 5,
+		paddingBottom: 5,
+	},
+
 	MenuModalButtonTxt: {
 		padding: 10,
 		textAlign: 'left',
-		color: Color.White
+		color: Color.Black
 	},
 	MenuModalTxt: {
 		padding: 5,
 		textAlign: 'right',
-		color: Color.White
+		color: Color.Black
 	},
 	modal: {
 		backgroundColor: 'rgba(0, 0, 0, 0.5)',
