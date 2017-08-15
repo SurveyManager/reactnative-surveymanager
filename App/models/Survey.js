@@ -6,10 +6,8 @@ import {
   TextInput,
   View,
   ListView,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Button
 } from 'react-native';
 import l18n from '../localization/all.js';
 import SurveyStyles from '../styles/SurveyStyles.js'

@@ -3,8 +3,6 @@ import renderIf from './App/libs/renderif'
 import { 
 	AppRegistry, 
 	View, 
-	StyleSheet, 
-	AsyncStorage, 
 	NetInfo, 
 	Modal, 
 	Button, 
@@ -42,9 +40,8 @@ NetInfo.fetch().then( function (survey,t) {
 	survey.networkChange(t);
 }.bind(null, survey));
 
-NetInfo.addEventListener(
-  'change',
-  function (survey, t) { survey.networkChange(t); }.bind(null, survey)
+NetInfo.addEventListener( 'change',
+	  function (survey, t) { survey.networkChange(t); }.bind(null, survey)
 );
 
 // Global methods
