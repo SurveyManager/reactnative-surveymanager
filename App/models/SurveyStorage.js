@@ -15,7 +15,7 @@ var SurveyStorage = function () {
 	this.save = function (data) {
 		// save survey question result
 		data.ts = new Date().getTime()/1000;
-		console.log("SAVE", data);
+		//console.log("SAVE", data);
 		return this._set("data:"+data.SH+":"+data.QH+":"+parseInt(data.ts),JSON.stringify(data));
 	}
 	

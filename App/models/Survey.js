@@ -24,8 +24,17 @@ const SurveyStyles = StyleSheet.create({
 	
 	otherText: {
 		padding: 20,
-		margin: 5,
+		margin: 10,
 		color: Color.Black,
+		borderColor: Color.BlueGrey, 
+		borderRadius: 5,
+		borderWidth: 0.5, 
+	},
+	activeOtherText: {
+		padding: 20,
+		margin: 10,
+		color: Color.White,
+		backgroundColor: Color.BlueGrey,
 		borderColor: Color.BlueGrey, 
 		borderRadius: 5,
 		borderWidth: 0.5, 
@@ -38,7 +47,7 @@ const SurveyStyles = StyleSheet.create({
 		borderWidth: 0.5, 
 		color: Color.White,
 		padding: 20,
-		margin: 5
+		margin: 10
 	},
 	opionStyle : {
 		backgroundColor: Color.White,
@@ -47,7 +56,7 @@ const SurveyStyles = StyleSheet.create({
 		borderWidth: 0.5, 
 		borderRadius: 5,
 		padding: 20,
-		margin: 5
+		margin: 10
 	},
 	tips: {
 		padding: 20,
@@ -170,10 +179,15 @@ var SurveyManager = function () {
 		if (is_one) {
 			this.questionFormState.oid = {};
 		}
-		if (this.questionFormState.oid[id]) {
-			this.questionFormState.oid[id]=false;
-		} else {
-			this.questionFormState.oid[id]=true;
+		if (id!==false) {
+			if (this.questionFormState.oid[id]) {
+				this.questionFormState.oid[id]=false;
+			} else {
+				this.questionFormState.oid[id]=true;
+			}
+			if (is_one) {
+				this.questionFormState.t="";
+			}
 		}
 		
 		this.renderQuestion(true);
@@ -207,16 +221,21 @@ var SurveyManager = function () {
 				this.currentQuestionOptionsObj = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 				var tmp = this.currentQuestion.options;
 				for (var i in tmp) {
-					if (tmp[i].id) { tmp[i].state=this.questionFormState.oid[(tmp[i].id)]?true:false; }
+					if (tmp[i].id) { 
+						tmp[i].state=this.questionFormState.oid[(tmp[i].id)]?true:false; 
+					}
 				}
 				this.currentQuestionOptions = this.currentQuestionOptionsObj.cloneWithRows(tmp);
 				if (this.currentQuestion.type=='one') {
 					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, true) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
+					if (this.currentQuestion.other==1) {
+						rother = (<View><TextInput style={this.questionFormState.t!=''?SurveyStyles.activeOtherText:SurveyStyles.otherText} onChangeText={(text) => {this.questionFormState.t=text; this.questionFormStateOption(false, true); }} defaultValue={this.questionFormState.t} placeholder={l18n.othervar} autoCorrect={false} /></View>);
+					}
 				} else {
 					r = (<View><ListView dataSource={this.currentQuestionOptions} renderRow={(rowData) => <TouchableOpacity onPress={ () => this.questionFormStateOption(rowData.id, false) }><Text style={ rowData.state?SurveyStyles.activeOpionStyle:SurveyStyles.opionStyle }>{rowData.title}</Text></TouchableOpacity> } /></View>);
-				}
-				if (this.currentQuestion.other==1) {
-					rother = (<View><TextInput style={SurveyStyles.otherText} onChangeText={(text) => this.questionFormState.t=text} placeholder={l18n.othervar} autoCorrect={false} /></View>);
+					if (this.currentQuestion.other==1) {
+						rother = (<View><TextInput style={this.questionFormState.t!=''?SurveyStyles.activeOtherText:SurveyStyles.otherText} onChangeText={(text) => { this.questionFormState.t=text; this.questionFormStateOption(false, false); }} defaultValue={this.questionFormState.t} placeholder={l18n.othervar} autoCorrect={false} /></View>);
+					}
 				}
 			} 
 			this.renderQuestionRender(r, rother);
@@ -245,7 +264,7 @@ var SurveyManager = function () {
 			//console.warn("Start sync");
 			syncStatus("start");
 			this.storage.sync('', 
-				function (s) { console.log("survey-sync-success"); }.bind(this), 
+				function (s) { }.bind(this), 
 				function (e) { this.getSurveyLoadError(e); }.bind(this));
 		}
 	}
@@ -294,7 +313,6 @@ var SurveyManager = function () {
 	}
 	
 	this.getSurveyLoadSuccess = function (v) {
-		//console.log("Survey",v);
 		this.storage.setSurvey(JSON.stringify(v));
 		this.survey = v;
 		this.rebuildKeys();

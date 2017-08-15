@@ -14,7 +14,9 @@ import {
 	Text, 
 	TextInput,
 	StatusBar, 
-	DrawerLayoutAndroid } from 'react-native';
+	DrawerLayoutAndroid,
+	KeyboardAvoidingView
+	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Color from 'react-native-material-color';
 import { Constants } from 'expo';
@@ -22,7 +24,7 @@ import l18n from './App/localization/all.js';
 
 var thisActivity = false;
 
-var uuid = require('react-native-uuid');
+//var uuid = require('react-native-uuid');
 
 var _storage = require('./App/models/SurveyStorage.js');
 	Sstorage=new _storage();
@@ -339,11 +341,13 @@ syncStatusHandlerFinish = function (s) {
 					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
 				</TouchableOpacity>
 			</View>
+			<KeyboardAvoidingView behavior='padding' style = {{backgroundColor: 'white', flex: 1}}>
 			<ScrollView style={MainScreenStyles.ScrollView}>
 				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 				{ this.state.q }
 				{ this.state.qother }
 			</ScrollView>
+			</KeyboardAvoidingView>
 		</View>
 		)}
 
