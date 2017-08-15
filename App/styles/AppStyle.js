@@ -94,6 +94,9 @@ var AppStyle = StyleSheet.create({
 		width: 200,
 		padding: 10,
 	},
+	statusBar: {
+		backgroundColor: Color.LightGreen,
+	}
 
 });
 

@@ -17,25 +17,27 @@ import {
 	KeyboardAvoidingView
 	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Color from 'react-native-material-color';
 import l18n from './App/localization/all.js';
 import MainScreenStyles from './App/styles/MainScreenStyles.js';
 import AppStyle from './App/styles/AppStyle.js';
+import config from './App/config.js';
 
 var thisActivity = false;
 
+// Init components
 var _storage = require('./App/models/SurveyStorage.js');
 	Sstorage=new _storage();
 	Sstorage.init({});
 	
 var _restapi = require('./App/models/restapi.js');
 	restapi=new _restapi();
-	restapi.init("https://survey.sovgvd.info/your-survey/API/");
+	restapi.init(config.APIurl);
 	
 var _manager = require('./App/models/Survey.js');
 	survey = new _manager();
 	survey.init({},Sstorage);
 
+// Init network info handler
 NetInfo.fetch().then( function (survey,t) {
 	survey.networkChange(t);
 }.bind(null, survey));
@@ -45,6 +47,7 @@ NetInfo.addEventListener(
   function (survey, t) { survey.networkChange(t); }.bind(null, survey)
 );
 
+// Global methods
 switchToLoginActivity = function (e) {
 	  if (e) {
 		  thisActivity.setState({ modalVisible: true, mainVisible: false, modalTxt: e });
@@ -60,7 +63,6 @@ clearDB = function () {
 	Sstorage._clearAll();
 }
 
-
 syncStatus = function (s) {
 	if (thisActivity) {
 		thisActivity.syncStatusHandler(s);
@@ -70,80 +72,80 @@ syncStatus = function (s) {
 
 
 export default class App extends React.Component {
-	static waitTimer = false;
-  constructor() {
-    super();
-    this.state = {
-		modalVisible: false, 
-		modalLoginVisible: false, 
-		mainVisible: false,
-		modalProgressVisible: true,
-		modalNewSurvey: false,
-		modalMenu: false,
-		syncProgress: false, 
-		modalTxt: "",
-		email: "",
-		survey: false,
-		syncicon: "md-cloud",
-		q: [],
-		qother: []
+	constructor() {
+		super();
+		this.state = {
+			modalVisible: false, 
+			modalLoginVisible: false, 
+			mainVisible: false,
+			modalProgressVisible: true,
+			modalNewSurvey: false,
+			modalMenu: false,
+			syncProgress: false, 
+			modalTxt: "",
+			email: "",
+			survey: false,
+			syncicon: "md-cloud",
+			q: [],
+			qother: []
+		}
+		thisActivity=this;
 	}
-	thisActivity=this;
-  }
-    
-  loginFormState = {
+
+	static waitTimer = false;
+  
+	syncStatusHandlerTimer = false;
+
+	loginFormState = {
 		"login": {text:''},
 		"password": {text:''}
-	  }
-  focusNextField = (nextField) => {
-    this.refs[nextField].focus();
-  };
-
-nextQuestion = function () {
-	survey.nextQuestion();
-}
-
-newSurvey = function () {
-	this.setState({ modalNewSurvey: true });
-}
-
-doNewSurvey = function () {
-	this.ModalMenu('hide');
-	survey.surveyNew();
-	this.hideNewSurvey();
-}
-hideNewSurvey = function () {
-	this.setState({ modalNewSurvey: false });
-}
-sync = function () {
-	this.ModalMenu('hide');
-	survey.surveySync();
-}
-
-syncStatusHandlerTimer = false;
-
-syncStatusHandler = function (s) {
-	if (this.syncStatusHandlerTimer) {
-		clearTimeout(this.syncStatusHandlerTimer);
-		this.syncStatusHandlerTimer=false;
 	}
-	if (s=='start' || s=='do') {
-		this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
-	} else if (s=='success') {
-		this.setState({ syncicon: "md-cloud-done", syncProgress: true } );
-	} else if (s=='failed') {
-		this.setState({ syncicon: "md-cloud-outline", syncProgress: true } );
-	}
-	this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
-}
+	focusNextField = (nextField) => {
+		this.refs[nextField].focus();
+	};
 
-syncStatusHandlerFinish = function (s) {
-	this.setState({ syncProgress: false } );
-}
+	nextQuestion = function () {
+		survey.nextQuestion();
+	}
+
+	newSurvey = function () {
+		this.setState({ modalNewSurvey: true });
+	}
+
+	doNewSurvey = function () {
+		this.ModalMenu('hide');
+		survey.surveyNew();
+		this.hideNewSurvey();
+	}
+	hideNewSurvey = function () {
+		this.setState({ modalNewSurvey: false });
+	}
+	sync = function () {
+		this.ModalMenu('hide');
+		survey.surveySync();
+	}
+
+	syncStatusHandler = function (s) {
+		if (this.syncStatusHandlerTimer) {
+			clearTimeout(this.syncStatusHandlerTimer);
+			this.syncStatusHandlerTimer=false;
+		}
+		if (s=='start' || s=='do') {
+			this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
+		} else if (s=='success') {
+			this.setState({ syncicon: "md-cloud-done", syncProgress: true } );
+		} else if (s=='failed') {
+			this.setState({ syncicon: "md-cloud-outline", syncProgress: true } );
+		}
+		this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
+	}
+
+	syncStatusHandlerFinish = function (s) {
+		this.setState({ syncProgress: false } );
+	}
   
-  doAuth = function () {
+	doAuth = function () {
 	  this.setState({modalProgressVisible: true });
-	  //console.warn("Auth network", survey.networkState());
 	  if (survey.networkState()) {
 		  restapi.doAuth(this.loginFormState.login.text, this.loginFormState.password.text, 
 			function(r) { this.doAuthSuccess(r); }.bind(this), 
@@ -153,34 +155,34 @@ syncStatusHandlerFinish = function (s) {
 			function() { this.doAuthSuccess(false); }.bind(this), 
 			function() { this.doAuthError(false); }.bind(this));
 	  }
-  }
-  doAuthSuccess = function (r) {
-	if (r) {
-		Sstorage.setToken(r['tokenID']);
-		Sstorage.setUser(JSON.stringify(r));
 	}
-	this.doAfterAuthSuccess();
-  }
-  doAfterAuthSuccess = function () {
-	  this.setState({ modalLoginVisible: false, modalProgressVisible: false });
-	  this.checkUser(false, false, false, false); 
-	  this.doLoad();
-  }
-  
-  doAuthError = function (r) {
-	  this.setState({modalProgressVisible: false, modalVisible: true, modalTxt: "Authorization error" });
-  }
-  
-  doLoad = function () {
-	  this.setState({modalProgressVisible: true });
-	  survey.getSurvey( function (r,e, other) {
+	doAuthSuccess = function (r) {
+		if (r) {
+			Sstorage.setToken(r['tokenID']);
+			Sstorage.setUser(JSON.stringify(r));
+		}
+		this.doAfterAuthSuccess();
+	}
+	doAfterAuthSuccess = function () {
+		this.setState({ modalLoginVisible: false, modalProgressVisible: false });
+		this.checkUser(false, false, false, false); 
+		this.doLoad();
+	}
+
+	doAuthError = function (r) {
+		this.setState({modalProgressVisible: false, modalVisible: true, modalTxt: "Authorization error" });
+	}
+
+	doLoad = function () {
+		this.setState({modalProgressVisible: true });
+		survey.getSurvey( function (r,e, other) {
 			this.setState({ survey: r, q: e, qother: other,  mainVisible: true, modalProgressVisible: false, });
-		  }.bind(this) );
-  }
+		}.bind(this) );
+	}
 
   
-  checkToken = function () {
-	  clearInterval(this.waitTimer);
+	checkToken = function () {
+		clearInterval(this.waitTimer);
 		Sstorage.getToken().then( function (v) { 
 			if (v) {
 				restapi.credentials = v;
@@ -190,16 +192,15 @@ syncStatusHandlerFinish = function (s) {
 				this.checkUser(false, false, false, false); 
 			}
 		}.bind(this));
-		
-  }
-  
-  checkUser = function (login, password, _callbackSuccess, _callbackFailed) {
+	}
+
+	checkUser = function (login, password, _callbackSuccess, _callbackFailed) {
 		Sstorage.getUser().then( function (login, password,_callbackSuccess, _callbackFailed, v) {
 			if (v) {
 				v=JSON.parse(v);
 				this.setState({ email:v.email });
 				this.loginFormState.login.text=v.email;
-				this.loginFormState.password.text="";//v.pin;
+				this.loginFormState.password.text="";
 				if (v.email && v.PIN && v.email==login && v.PIN==password && _callbackSuccess!==false)  {
 					_callbackSuccess(false);
 				} else {
@@ -209,18 +210,17 @@ syncStatusHandlerFinish = function (s) {
 				if (_callbackFailed!==false) _callbackSuccess(false);
 			}
 		}.bind(this, login, password,_callbackSuccess, _callbackFailed));
+	}
 
-  }
-  
-  componentDidMount() {
-	  this.waitTimer = setInterval (function () { 
-		if (survey.ready) { 
-			this.checkToken(); 
-		} else { 
-			//console.warn("WAIT...", survey.ready); 
-		} 
+	componentDidMount() {
+		this.waitTimer = setInterval (function () { 
+			if (survey.ready) { 
+				this.checkToken(); 
+			} else { 
+				//console.warn("WAIT...", survey.ready); 
+			} 
 		}.bind(this), 100);
-  }
+	}
 
 	ModalMenu(d) {
 		if (d=='show') {
@@ -258,7 +258,7 @@ syncStatusHandlerFinish = function (s) {
       renderNavigationView={() => navigationView}>
       <View style={AppStyle.Main}>
       <StatusBar
-		backgroundColor={Color.LightGreen}
+		style={AppStyle.statusBar}
 		barStyle="dark-content"
 		/>
          <Modal
