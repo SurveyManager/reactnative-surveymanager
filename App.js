@@ -13,7 +13,8 @@ import {
 	StatusBar, 
 	DrawerLayoutAndroid,
 	KeyboardAvoidingView,
-	WebView
+	WebView,
+	Share
 	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import l18n from './App/localization/all.js';
@@ -84,11 +85,11 @@ export default class App extends React.Component {
 			syncProgress: false, 
 			modalTxt: "",
 			email: "",
-			webViewHeight: 100,
+			webViewHeight: 1,
 			survey: false,
 			syncicon: "md-cloud",
 			q: "",
-			qother: [],
+			qother: "",
 		}
 		thisActivity=this;
 	}
@@ -111,6 +112,15 @@ export default class App extends React.Component {
 
 	newSurvey = function () {
 		this.setState({ modalNewSurvey: true });
+	}
+	
+	shareSurveyResult = function () {
+		Share.share({
+			message: 'TODO msg with DATA',
+			title: 'Share Survey'
+		}, {
+			dialogTitle: 'Share Survey',
+		})
 	}
 
 	doNewSurvey = function () {
@@ -182,7 +192,7 @@ export default class App extends React.Component {
 
 	doLoad = function () {
 		this.setState({modalProgressVisible: true });
-		survey.getSurvey( function (r,e, other) {
+		survey.getSurvey( function (r, e, other) {
 			this.setState({ survey: r, q: e, qother: other,  mainVisible: true, modalProgressVisible: false, });
 		}.bind(this) );
 	}
@@ -244,15 +254,16 @@ export default class App extends React.Component {
 		switchToLoginActivity(false);
 	}
 
-	_updateWebViewHeight(event) {
-		console.warn(event);
-        //this.setState({webViewHeight: parseInt(event.jsEvaluationValue)});
+	webViewMsg(event) {
+		var h=parseInt(event.nativeEvent.data);
+		//console.warn(h);
+		thisActivity.setState({webViewHeight: h});
     }
 
 
 
   render() {
-	  var rhtml="<html><body><h1>dfghdfghdfg</h1><script>window.postMessage(document.body.scrollHeight); alert(123);</script></body></html>";
+	  var rhtml='<html><head><title>test</title></head><body><h1 id="someid">1dfghdfghdfg</h1><script></script></body></html>';
 	  var navigationView = (<View style={AppStyle.MenuModalInner}>
 				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
@@ -351,10 +362,13 @@ export default class App extends React.Component {
 				<Text style={MainScreenStyles.NavTitle}>{this.state.survey.title}</Text>
 				{renderIf(this.state.syncProgress)(
 				<Ionicons style={MainScreenStyles.NavSyncIcon} name={this.state.syncicon} size={32} color="white" />
-				)}
+				)}{renderIf(this.state.surveyVisible)(
 				<TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtnNext}>
 					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
-				</TouchableOpacity>
+				</TouchableOpacity>)}{renderIf(this.state.resultVisible)(
+				<TouchableOpacity onPress={() => this.shareSurveyResult()} style={MainScreenStyles.NavBtnNext}>
+					<Ionicons name="md-share" size={32} color="black" />
+				</TouchableOpacity>)}
 			</View>
 			{renderIf(this.state.surveyVisible)(
 			<KeyboardAvoidingView behavior='padding' style = {{backgroundColor: 'white', flex: 1}}>
@@ -370,10 +384,12 @@ export default class App extends React.Component {
 				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 				<WebView 
 					automaticallyAdjustContentInsets={true} 
-					javaScriptEnabled={true} 
-					onMessage={this._updateWebViewHeight} 
-                    scrollEnabled={false} source={{html: rhtml }}  
-                    style={{flex: 1, height: 1 }}/>
+					injectedJavaScript='var t=false; function _rn_height() { if (t) { clearTimeout(t); t=false; }; if (window.postMessage.length !== 1) { t=setTimeout(_rn_height,500); } else { try { window.postMessage(parseInt(document.body.scrollHeight)); t=setTimeout(_rn_height,2000); } catch (e) { } } }; window.onLoad=_rn_height();' 
+					onMessage={this.webViewMsg} 
+                    scrollEnabled={false} 
+                    source={{html: this.state.qother }}  
+                    automaticallyAdjustContentInsets={true}
+                    style={[AppStyle.webViewStyle, {height: this.state.webViewHeight }]}/>
 			</ScrollView>
 			</KeyboardAvoidingView>
 			)}

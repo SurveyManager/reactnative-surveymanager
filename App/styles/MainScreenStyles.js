@@ -70,7 +70,7 @@ var MainScreenStyles = StyleSheet.create({
 	NavBtnNext: {
 		position: 'absolute',
 		bottom: 15,
-		right: 10,
+		right: 20,
 		backgroundColor: Color.Transparent,
 	},
 	NavSyncIcon : {

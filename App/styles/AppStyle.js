@@ -9,6 +9,14 @@ import Color from 'react-native-material-color';
 
 
 var AppStyle = StyleSheet.create({
+	webViewStyle : {
+		width: Dimensions.get('window').width-20,
+		marginTop: 5,
+		marginBottom: 5,
+		marginLeft: 10,
+		marginRight: 10,
+
+	},
 	Main: {
 		width: Dimensions.get('window').width,
 		height: Dimensions.get('window').height,

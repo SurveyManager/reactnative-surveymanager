@@ -17,10 +17,12 @@ var l18n = {
     next: "Next",
     startsurvey:"Start survey",
     othervar:"Other variant",
+    othershort:"Other",
     nexttocontinue:"Press > button to continue",
     nexttostart:"Press > button to start survey",
     syncmanual:"Sync manualy",
-    surveyresults: "Survey results"
+    surveyresults: "Survey results",
+    totalanswers: "Total answers"
 
   };
 
