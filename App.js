@@ -12,7 +12,8 @@ import {
 	TextInput,
 	StatusBar, 
 	DrawerLayoutAndroid,
-	KeyboardAvoidingView
+	KeyboardAvoidingView,
+	WebView
 	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import l18n from './App/localization/all.js';
@@ -72,6 +73,8 @@ export default class App extends React.Component {
 	constructor() {
 		super();
 		this.state = {
+			surveyVisible: true, 
+			resultVisible: false, 
 			modalVisible: false, 
 			modalLoginVisible: false, 
 			mainVisible: false,
@@ -81,10 +84,11 @@ export default class App extends React.Component {
 			syncProgress: false, 
 			modalTxt: "",
 			email: "",
+			webViewHeight: 100,
 			survey: false,
 			syncicon: "md-cloud",
-			q: [],
-			qother: []
+			q: "",
+			qother: [],
 		}
 		thisActivity=this;
 	}
@@ -110,6 +114,7 @@ export default class App extends React.Component {
 	}
 
 	doNewSurvey = function () {
+		this.setState({ surveyVisible: true, resultVisible: false });
 		this.ModalMenu('hide');
 		survey.surveyNew();
 		this.hideNewSurvey();
@@ -120,6 +125,11 @@ export default class App extends React.Component {
 	sync = function () {
 		this.ModalMenu('hide');
 		survey.surveySync();
+	}
+	surveyResults = function () {
+		this.ModalMenu('hide');
+		this.setState({ surveyVisible: false, resultVisible: true });
+		survey.surveyResults();
 	}
 
 	syncStatusHandler = function (s) {
@@ -234,12 +244,22 @@ export default class App extends React.Component {
 		switchToLoginActivity(false);
 	}
 
+	_updateWebViewHeight(event) {
+		console.warn(event);
+        //this.setState({webViewHeight: parseInt(event.jsEvaluationValue)});
+    }
+
+
 
   render() {
+	  var rhtml="<html><body><h1>dfghdfghdfg</h1><script>window.postMessage(document.body.scrollHeight); alert(123);</script></body></html>";
 	  var navigationView = (<View style={AppStyle.MenuModalInner}>
 				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.newsurvey}</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={() => this.surveyResults()} style={AppStyle.MenuModalButton}>
+					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.surveyresults}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => this.sync()} style={AppStyle.MenuModalButton}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.syncmanual}</Text>
@@ -336,6 +356,7 @@ export default class App extends React.Component {
 					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
 				</TouchableOpacity>
 			</View>
+			{renderIf(this.state.surveyVisible)(
 			<KeyboardAvoidingView behavior='padding' style = {{backgroundColor: 'white', flex: 1}}>
 			<ScrollView style={MainScreenStyles.ScrollView}>
 				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
@@ -343,6 +364,19 @@ export default class App extends React.Component {
 				{ this.state.qother }
 			</ScrollView>
 			</KeyboardAvoidingView>
+			)}{renderIf(this.state.resultVisible)(
+			<KeyboardAvoidingView behavior='padding' style = {{backgroundColor: 'white', flex: 1}}>
+			<ScrollView style={MainScreenStyles.ScrollView}>
+				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
+				<WebView 
+					automaticallyAdjustContentInsets={true} 
+					javaScriptEnabled={true} 
+					onMessage={this._updateWebViewHeight} 
+                    scrollEnabled={false} source={{html: rhtml }}  
+                    style={{flex: 1, height: 1 }}/>
+			</ScrollView>
+			</KeyboardAvoidingView>
+			)}
 		</View>
 		)}
 

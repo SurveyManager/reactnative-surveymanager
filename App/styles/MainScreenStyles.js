@@ -64,8 +64,8 @@ var MainScreenStyles = StyleSheet.create({
 		padding: 10, 
 		borderRadius: 4, 
 		borderWidth: 0.5, 
-		borderColor: Color.Blue[900], 
-		backgroundColor: Color.Blue,
+		borderColor: Color.LightGreen[900], 
+		backgroundColor: Color.LightGreen,
 	},
 	NavBtnNext: {
 		position: 'absolute',

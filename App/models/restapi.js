@@ -69,6 +69,25 @@ var restapi = function () {
 		}
 	}
 	
+	this.doResults = function (_callbackSuccess, _callbackFailed) {
+		var _data = {"request_id":"API_results"};
+		this.api("result",this._prepareRequest(_data), 
+			function (_callbackSuccess, _callbackFailed, r) { this.doResults_answer(r, _callbackSuccess, _callbackFailed)}.bind(this,_callbackSuccess, _callbackFailed));		
+	}
+	this.doResults_answer = function(raw,_callbackSuccess, _callbackFailed) {
+		try {
+			var r=JSON.parse(raw);
+			if (r['ok']) {
+				_callbackSuccess(r['d']);
+			} else {
+				_callbackFailed(r['e']);
+			}
+		} catch (e) {
+			console.log("RAW",raw);
+			_callbackFailed(["internal_parse_error"]);
+		}
+	}
+	
 	this._prepareRequest = function (_raw, _Draw) {
 		var tmp=new Array();
 		if (this.credentials) {

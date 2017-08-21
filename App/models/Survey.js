@@ -8,6 +8,7 @@ import {
   ListView,
   ScrollView,
   TouchableOpacity,
+  WebView,
 } from 'react-native';
 import l18n from '../localization/all.js';
 import SurveyStyles from '../styles/SurveyStyles.js'
@@ -77,6 +78,19 @@ var SurveyManager = function () {
 					this.getSurveyLoadError(["no_survey_in_cache"]);
 				}
 			}.bind(this));
+		}
+	}
+	
+	
+	this.surveyResults = function () {
+		if (this.network) {
+			restapi.doResults(
+				function(r) { 
+					this.getSurveyResultsLoadSuccess(r); }.bind(this), 
+				function(r) { 
+					this.getSurveyLoadError(r); }.bind(this)
+				);
+		} else {
 		}
 	}
 	
@@ -254,6 +268,15 @@ var SurveyManager = function () {
 		this.survey = v;
 		this.rebuildKeys();
 		this.renderSurveyInfo();
+	}
+
+	this.getSurveyResultsLoadSuccess = function (v) {
+		//console.warn("Results",v);
+		if (this.getSurveyCallback) {
+			var v_js = JSON.stringify(v.questions).replace(new RegExp("\}","g"),"}\n");
+			let rhtml="<h1>dghdfghdfg</h1><p>fgsdfgsdfgsdfgd</p><h2>zzzzzzz</h2>";
+			this.getSurveyCallback({ title: v.survey.title, description: v.survey.Description}, rhtml);
+		}
 	}
 	
 	this.getSurveyLoadError = function (r) {
