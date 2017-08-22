@@ -145,7 +145,7 @@ export default class App extends React.Component {
 	}
 	surveyResults = function () {
 		this.ModalMenu('hide');
-		this.setState({ surveyVisible: false, resultVisible: true });
+		this.setState({ surveyVisible: false, resultVisible: true, qother: "" });
 		survey.surveyResults();
 	}
 
@@ -266,7 +266,6 @@ export default class App extends React.Component {
 
 	webViewMsg(event) {
 		var h=parseInt(event.nativeEvent.data);
-		//console.warn(h);
 		thisActivity.setState({webViewHeight: h});
     }
 

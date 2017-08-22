@@ -106,7 +106,7 @@ var SurveyManager = function () {
 	this.renderSurveyInfo = function () {
 		if (this.getSurveyCallback) {
 			let start = (<View style={{ flex: 1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center', marginTop:30 }}><TouchableOpacity onPress={ () => this.pressCallback('start','')}><Text style={SurveyStyles.button}>{l18n.startsurvey}</Text></TouchableOpacity></View>);
-			this.getSurveyCallback({ title: this.survey.survey.title, description: this.survey.survey.Description}, start);
+			this.getSurveyCallback({ title: this.survey.survey.title, description: this.survey.survey.Description}, start, null, {cur: 0, total: 10 });
 		}
 	}
 	
@@ -278,7 +278,7 @@ var SurveyManager = function () {
 			var v_html="";
 			for (var i in v.questions) {
 				if (v.questions[i].title) {
-					v_html+="<div style='margin:15px 0px 5px 0px; padding:15px 0px 0px 0px; border-top:1px solid gray;'>";
+					v_html+="<div style='margin:15px 0px 5px 0px; padding:15px 5px 0px 5px; border-top:1px solid gray;'>";
 					v_html+="<div style='text-weight: bold;'>"+v.questions[i].title+"</div>";
 					v_html+="<div style='color: gray; margin-bottom:5px;'>"+v.questions[i].description+"</div>";
 					if (v.questions[i].type=='one' || v.questions[i].type=='multi') {
