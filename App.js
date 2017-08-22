@@ -122,10 +122,10 @@ export default class App extends React.Component {
 	
 	shareSurveyResult = function () {
 		Share.share({
-			message: 'TODO msg with DATA',
-			title: 'Share Survey'
+			message: (survey.surveyTXTresult!==false?survey.surveyTXTresult:"No results"),
+			title: 'Survey results',
 		}, {
-			dialogTitle: 'Share Survey',
+			dialogTitle: 'Share Survey results',
 		})
 	}
 
