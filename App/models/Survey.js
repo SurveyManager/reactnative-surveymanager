@@ -150,7 +150,7 @@ var SurveyManager = function () {
 	}
 	
 	this.renderQuestionRender = function (r,rother) {
-		this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r, rother);
+		this.getSurveyCallback({ title: this.currentQuestion.title, description: this.currentQuestion.description}, r, rother, {cur: this.currentQuestionsNum, total: (this.surveyKeys.length-1) });
 	}
 	
 	this.renderQuestion = function (doreinit) {

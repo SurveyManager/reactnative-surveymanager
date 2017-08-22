@@ -9,6 +9,11 @@ import Color from 'react-native-material-color';
 
 
 var AppStyle = StyleSheet.create({
+	ProgressSlider: {
+		height: 30,
+		margin: 0,
+		backgroundColor: Color.LightGreen
+	},
 	webViewStyle : {
 		width: Dimensions.get('window').width-20,
 		marginTop: 5,

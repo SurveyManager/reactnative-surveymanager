@@ -14,7 +14,9 @@ import {
 	DrawerLayoutAndroid,
 	KeyboardAvoidingView,
 	WebView,
-	Share
+	Share,
+	Slider,
+	ProgressBar,
 	} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import l18n from './App/localization/all.js';
@@ -90,6 +92,10 @@ export default class App extends React.Component {
 			syncicon: "md-cloud",
 			q: "",
 			qother: "",
+			progressData: {
+				cur:0,
+				total:10
+			}
 		}
 		thisActivity=this;
 	}
@@ -125,6 +131,7 @@ export default class App extends React.Component {
 
 	doNewSurvey = function () {
 		this.setState({ surveyVisible: true, resultVisible: false });
+		this.setState({ progressData: {cur:0, total:10} });
 		this.ModalMenu('hide');
 		survey.surveyNew();
 		this.hideNewSurvey();
@@ -192,8 +199,11 @@ export default class App extends React.Component {
 
 	doLoad = function () {
 		this.setState({modalProgressVisible: true });
-		survey.getSurvey( function (r, e, other) {
+		survey.getSurvey( function (r, e, other, progress) {
 			this.setState({ survey: r, q: e, qother: other,  mainVisible: true, modalProgressVisible: false, });
+			if (progress) {
+				this.setState({progressData: progress });
+			}
 		}.bind(this) );
 	}
 
@@ -263,7 +273,6 @@ export default class App extends React.Component {
 
 
   render() {
-	  var rhtml='<html><head><title>test</title></head><body><h1 id="someid">1dfghdfghdfg</h1><script></script></body></html>';
 	  var navigationView = (<View style={AppStyle.MenuModalInner}>
 				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
@@ -373,6 +382,7 @@ export default class App extends React.Component {
 			{renderIf(this.state.surveyVisible)(
 			<KeyboardAvoidingView behavior='padding' style = {{backgroundColor: 'white', flex: 1}}>
 			<ScrollView style={MainScreenStyles.ScrollView}>
+				<Slider disabled={true} minimumTrackTintColor={'black'} thumbTintColor={'white'} style={AppStyle.ProgressSlider} value={this.state.progressData.cur} minimumValue={0} maximumValue={this.state.progressData.total} step={1} />
 				<Text style={MainScreenStyles.surveyTitle}>{this.state.survey.title}</Text><Text style={MainScreenStyles.surveyDescription}>{this.state.survey.description}</Text>
 				{ this.state.q }
 				{ this.state.qother }
