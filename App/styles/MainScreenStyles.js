@@ -75,14 +75,14 @@ var MainScreenStyles = StyleSheet.create({
 	},
 	NavSyncIcon : {
 		position: 'absolute',
-		bottom: 15,
-		right: 50,
+		bottom: 22,
+		right: 52,
 		backgroundColor: Color.Transparent,
 	},
 	NavSyncProgress : {
 		position: 'absolute',
-		bottom: 5,
-		right: 50,
+		bottom: 12,
+		right: 52,
 		color: Color.White,
 		width:32,
 		height:13,

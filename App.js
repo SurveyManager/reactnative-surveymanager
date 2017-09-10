@@ -155,22 +155,27 @@ export default class App extends React.Component {
 			clearTimeout(this.syncStatusHandlerTimer);
 			this.syncStatusHandlerTimer=false;
 		}
+		hideAfter=false;
 		if (s=='start' || s=='do') {
 			this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
 		} else if (s=='success') {
+			hideAfter=true;
 			this.setState({ syncicon: "md-cloud-done", syncProgress: true, syncProgressPerc: "Done" } );
 		} else if (s=='failed') {
+			hideAfter=true;
 			this.setState({ syncicon: "md-cloud-outline", syncProgress: true, syncProgressPerc: "Error" } );
 		} else if (s=='busy') {
 			this.setState({ syncicon: "md-cloud-circle", syncProgress: true } );
 		} else if (s>0) {
-			this.setState({ syncProgressPerc: s+"%" })
+			this.setState({ syncProgressPerc: s+"%", syncProgress: true })
 		}
-		this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
+		if (hideAfter) {
+			this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
+		}
 	}
 
 	syncStatusHandlerFinish = function (s) {
-		this.setState({ syncProgress: false } );
+		this.setState({ syncProgress: false, syncProgressPerc: "" } );
 	}
   
 	doAuth = function () {

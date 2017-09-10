@@ -72,7 +72,7 @@ var SurveyStorage = function () {
 				this.syncLock=true;
 				//syncStatus("do");
 				var t = this.syncData.shift();
-				//console.log("Elements progress ", (this.syncDataElements>0?parseInt((1-this.syncData.length/this.syncDataElements)*100):"none"));
+				console.log("Elements progress ", (this.syncDataElements>0?parseInt((1-this.syncData.length/this.syncDataElements)*100):"none"));
 				syncStatus((this.syncDataElements>0?parseInt((1-this.syncData.length/this.syncDataElements)*100):""));
 				restapi.doSave(t.data, 
 					function(_callbackSuccess, k, r) { 
