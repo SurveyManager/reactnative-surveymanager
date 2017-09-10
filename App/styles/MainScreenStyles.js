@@ -79,6 +79,21 @@ var MainScreenStyles = StyleSheet.create({
 		right: 50,
 		backgroundColor: Color.Transparent,
 	},
+	NavSyncProgress : {
+		position: 'absolute',
+		bottom: 5,
+		right: 50,
+		color: Color.White,
+		width:32,
+		height:13,
+		padding: 0,
+		textAlign: 'center',
+		fontSize: 9,
+		borderRadius: 4, 
+		borderWidth: 0.5, 
+		borderColor: Color.LightGreen[900], 
+		backgroundColor: Color.LightGreen,
+	},
 	NavBtnTxt: {
 		textAlign: 'center',
 		color: Color.White

@@ -7,6 +7,12 @@ const suuid = require('uuid/v4');
 var SurveyStorage = function () {
 	this.config=false;
 	this.prefix="SurveyStorage";
+
+	this.syncLock=true;
+	this.syncData=false;
+	this.syncDataElements=0;
+	this.syncCallbackSuccess=false;
+	this.syncCallbackFailed=false;
 	
 	this.init = function (_config) {
 		this.config=_config;
@@ -31,30 +37,25 @@ var SurveyStorage = function () {
 		try {
 			AsyncStorage.getAllKeys(function (id, _callbackSuccess, _callbackFailed, err, keys) {
 				AsyncStorage.multiGet(keys, function (id, _callbackSuccess, _callbackFailed, err, stores) {
-					stores.map(function (id, _callbackSuccess, _callbackFailed, result, i, store) {
-						if ((!id &&  store[i][0].indexOf(":data:")!=-1) || store[i][0].indexOf(":data:"+id+":")!=-1) {
-							//console.log("SYNC ",i," id=",store[i][0]," data=",store[i][1]);
-							try {
-								// TODO, one by one!!!
-								var tmp = JSON.parse(store[i][1]);
-								if (tmp.SH && tmp.QH) {
-									delete tmp.type;
-									//console.log("so send", tmp);
-									syncStatus("do");
-									restapi.doSave(tmp, 
-										function(_callbackSuccess, k, r) { 
-											this._syncElementSuccess(k, r,_callbackSuccess); }.bind(this, _callbackSuccess,store[i][0]), 
-										function(_callbackFailed, k, r) { 
-											this._syncElementError(k, r,_callbackFailed); }.bind(this, _callbackFailed,store[i][0])
-										);
+					var tmp = new Array();
+					for (var i in stores) {
+						try {
+							if ((!id && stores[i][0].indexOf(":data:")!=-1) || stores[i][0].indexOf(":data:"+id+":")!=-1) {
+								var tmp2=JSON.parse(stores[i][1]);
+								if (tmp2.SH && tmp2.QH) {
+									tmp.push({id: stores[i][0], data: tmp2});
 								}
-							} catch (e) {
-								console.log("CATCH error", e);
+							} else {
 							}
-						} else {
-							//console.log("---- ",i," id=",store[i][0]," data=",store[i][1]);
+						} catch (e) {
 						}
-					}.bind(this,id,_callbackSuccess, _callbackFailed))
+					}
+					this.syncData=tmp;
+					this.syncDataElements=tmp.length;
+					this.syncCallbackSuccess=_callbackSuccess;
+					this.syncCallbackFailed=_callbackFailed;
+					this.syncLock=false;
+					this.syncDo(false);
 				}.bind(this,id,_callbackSuccess, _callbackFailed))
 			}.bind(this,id,_callbackSuccess, _callbackFailed))
 		} catch (e) {
@@ -62,17 +63,47 @@ var SurveyStorage = function () {
 		}
 	}
 	
-	this._syncElementSuccess = function (k,r,_callbackS) {
+	
+	this.syncDo = function (force) {
+		if (this.syncLock && !force) {
+			syncStatus("busy");
+		} else {
+			if (this.syncData.length>0) {
+				this.syncLock=true;
+				//syncStatus("do");
+				var t = this.syncData.shift();
+				//console.log("Elements progress ", (this.syncDataElements>0?parseInt((1-this.syncData.length/this.syncDataElements)*100):"none"));
+				syncStatus((this.syncDataElements>0?parseInt((1-this.syncData.length/this.syncDataElements)*100):""));
+				restapi.doSave(t.data, 
+					function(_callbackSuccess, k, r) { 
+						this._syncElementSuccess(k, r,_callbackSuccess); }.bind(this, this.syncCallbackSuccess, t.id), 
+					function(_callbackFailed, k, r) { 
+						this._syncElementError(k, r,_callbackFailed); }.bind(this, this.syncCallbackFailed, t.id)
+					);
+			} else {
+				this.syncLock=false;
+				this.syncData=false;
+				this.syncElements=0;
+				this.syncCallbackSuccess=false;
+				this.syncCallbackFailed=false;
+				syncStatus("success");
+			}
+		}
+	}
+	
+	this._syncElementSuccess = function (k ,r,_callbackS) {
 		//console.log("SYNC-success", k, r);
-		syncStatus("success");
+		//syncStatus("success");
 		this._remove(k);
 		_callbackS(r);
+		this.syncDo(true);
 	}
 	
 	this._syncElementError = function (k,r,_callbackE) {
 		//console.log("SYNC-failed", k, r);
 		syncStatus("failed");
 		_callbackE(r);
+		//this.syncDo(false);
 	}
 	
 	this.setToken = function (token) {

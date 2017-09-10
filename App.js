@@ -85,6 +85,7 @@ export default class App extends React.Component {
 			modalNewSurvey: false,
 			modalMenu: false,
 			syncProgress: false, 
+			syncProgressPerc: "",
 			modalTxt: "",
 			email: "",
 			webViewHeight: 1,
@@ -157,9 +158,13 @@ export default class App extends React.Component {
 		if (s=='start' || s=='do') {
 			this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
 		} else if (s=='success') {
-			this.setState({ syncicon: "md-cloud-done", syncProgress: true } );
+			this.setState({ syncicon: "md-cloud-done", syncProgress: true, syncProgressPerc: "Done" } );
 		} else if (s=='failed') {
-			this.setState({ syncicon: "md-cloud-outline", syncProgress: true } );
+			this.setState({ syncicon: "md-cloud-outline", syncProgress: true, syncProgressPerc: "Error" } );
+		} else if (s=='busy') {
+			this.setState({ syncicon: "md-cloud-circle", syncProgress: true } );
+		} else if (s>0) {
+			this.setState({ syncProgressPerc: s+"%" })
 		}
 		this.syncStatusHandlerTimer = setTimeout(function (s) { this.syncStatusHandlerFinish(s) }.bind(this,s) ,1500);
 	}
@@ -370,7 +375,7 @@ export default class App extends React.Component {
 				<Text style={MainScreenStyles.NavTitle}>{this.state.survey.title}</Text>
 				{renderIf(this.state.syncProgress)(
 				<Ionicons style={MainScreenStyles.NavSyncIcon} name={this.state.syncicon} size={32} color="white" />
-				)}{renderIf(this.state.surveyVisible)(
+				)}{renderIf(this.state.syncProgress)(<Text style={MainScreenStyles.NavSyncProgress}>{this.state.syncProgressPerc}</Text>)}{renderIf(this.state.surveyVisible)(
 				<TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtnNext}>
 					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
 				</TouchableOpacity>)}{renderIf(this.state.resultVisible)(
