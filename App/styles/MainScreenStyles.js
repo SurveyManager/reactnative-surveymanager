@@ -4,13 +4,11 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { Constants } from 'expo';
 import Color from 'react-native-material-color';
 
 
 var MainScreenStyles = StyleSheet.create({
 	MainView: {
-		paddingTop: Constants.statusBarHeight,
 		width: Dimensions.get('window').width,
 		height: Dimensions.get('window').height,
 		backgroundColor: Color.Black,

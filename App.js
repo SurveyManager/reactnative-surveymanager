@@ -18,7 +18,8 @@ import {
 	Slider,
 	ProgressBar,
 	} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Color from 'react-native-material-color';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import l18n from './App/localization/all.js';
 import MainScreenStyles from './App/styles/MainScreenStyles.js';
 import AppStyle from './App/styles/AppStyle.js';
@@ -90,7 +91,7 @@ export default class App extends React.Component {
 			email: "",
 			webViewHeight: 1,
 			survey: false,
-			syncicon: "md-cloud",
+			syncicon: "clock-o",
 			q: "",
 			qother: "",
 			progressData: {
@@ -157,15 +158,15 @@ export default class App extends React.Component {
 		}
 		hideAfter=false;
 		if (s=='start' || s=='do') {
-			this.setState({ syncicon: "md-cloud-upload", syncProgress: true } );
+			this.setState({ syncicon: "cloud-upload", syncProgress: true } );
 		} else if (s=='success') {
 			hideAfter=true;
-			this.setState({ syncicon: "md-cloud-done", syncProgress: true, syncProgressPerc: "Done" } );
+			this.setState({ syncicon: "cloud", syncProgress: true, syncProgressPerc: "Done" } );
 		} else if (s=='failed') {
 			hideAfter=true;
-			this.setState({ syncicon: "md-cloud-outline", syncProgress: true, syncProgressPerc: "Error" } );
+			this.setState({ syncicon: "exclamation-circle", syncProgress: true, syncProgressPerc: "Error" } );
 		} else if (s=='busy') {
-			this.setState({ syncicon: "md-cloud-circle", syncProgress: true } );
+			this.setState({ syncicon: "clock-o", syncProgress: true } );
 		} else if (s>0) {
 			this.setState({ syncProgressPerc: s+"%", syncProgress: true })
 		}
@@ -304,13 +305,13 @@ export default class App extends React.Component {
       renderNavigationView={() => navigationView}>
       <View style={AppStyle.Main}>
       <StatusBar
-		style={AppStyle.statusBar}
-		barStyle="dark-content"
+		backgroundColor={Color.LightGreen}
+		barStyle="light-content"
 		/>
          <Modal
           animationType={"fade"}
           transparent={true}
-          presentationStyle={"fullScreen"}
+          presentationStyle={"overFullScreen"}
           visible={this.state.modalVisible}
           onRequestClose={() => { _goLoginActivity() }}
           >
@@ -323,7 +324,7 @@ export default class App extends React.Component {
          <Modal
           animationType={"fade"}
           transparent={true}
-          presentationStyle={"fullScreen"}
+          presentationStyle={"overFullScreen"}
           visible={this.state.modalLoginVisible}
           onRequestClose={() => { _goLoginActivity() }}
           >
@@ -340,7 +341,7 @@ export default class App extends React.Component {
          <Modal
           animationType={"fade"}
           transparent={true}
-          presentationStyle={"fullScreen"}
+          presentationStyle={"overFullScreen"}
           visible={this.state.modalProgressVisible}
           onRequestClose={() => { _goLoginActivity() }}
           >
@@ -353,7 +354,7 @@ export default class App extends React.Component {
          <Modal
           animationType={"fade"}
           transparent={true}
-          presentationStyle={"fullScreen"}
+          presentationStyle={"overFullScreen"}
           visible={this.state.modalNewSurvey}
           onRequestClose={() => { this.hideNewSurvey() }}
           >
@@ -375,17 +376,17 @@ export default class App extends React.Component {
 		<View style={MainScreenStyles.MainView}>
 			<View style={MainScreenStyles.NavView}>
 				<TouchableOpacity onPress={() => this.ModalMenu('show')} style={MainScreenStyles.NavBtnMenu}>
-					<Ionicons name="md-menu" size={32} color="black" />
+					<Icon name="bars" size={32} color="black" />
 				</TouchableOpacity>
 				<Text style={MainScreenStyles.NavTitle}>{this.state.survey.title}</Text>
 				{renderIf(this.state.syncProgress)(
-				<Ionicons style={MainScreenStyles.NavSyncIcon} name={this.state.syncicon} size={32} color="white" />
+				<Icon style={MainScreenStyles.NavSyncIcon} name={this.state.syncicon} size={32} color="white" />
 				)}{renderIf(this.state.syncProgress)(<Text style={MainScreenStyles.NavSyncProgress}>{this.state.syncProgressPerc}</Text>)}{renderIf(this.state.surveyVisible)(
 				<TouchableOpacity onPress={() => this.nextQuestion()} style={MainScreenStyles.NavBtnNext}>
-					<Ionicons name="ios-arrow-dropright-circle" size={32} color="black" />
+					<Icon name="arrow-circle-right" size={32} color="black" />
 				</TouchableOpacity>)}{renderIf(this.state.resultVisible)(
 				<TouchableOpacity onPress={() => this.shareSurveyResult()} style={MainScreenStyles.NavBtnNext}>
-					<Ionicons name="md-share" size={32} color="black" />
+					<Icon name="share-alt" size={32} color="black" />
 				</TouchableOpacity>)}
 			</View>
 			{renderIf(this.state.surveyVisible)(

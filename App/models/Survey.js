@@ -331,7 +331,7 @@ var SurveyManager = function () {
 					v_html+="</div>"
 				}
 			}
-			console.log(this.surveyTXTresult);
+			//console.log(this.surveyTXTresult);
 			v_html="<html><body style='margin:0; padding:0;'><div style='width:100%; margin-bottom:25px;'>"+v_html+"</div></body></html>";
 			this.getSurveyCallback({ title: v.survey.title, description: v.survey.Description}, "", v_html);
 		}

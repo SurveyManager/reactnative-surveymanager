@@ -4,7 +4,6 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { Constants } from 'expo';
 import Color from 'react-native-material-color';
 
 
@@ -48,7 +47,6 @@ var AppStyle = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Color.Gray,
-    paddingTop: Constants.statusBarHeight,
   },
   MenuModal: {
 	  backgroundColor: Color.Transparent,
