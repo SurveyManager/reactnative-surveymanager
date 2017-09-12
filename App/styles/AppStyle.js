@@ -72,6 +72,11 @@ var AppStyle = StyleSheet.create({
 		textAlign: 'left',
 		color: Color.Black
 	},
+	MenuModalIconButtonTxt: {
+		padding: 5,
+		textAlign: 'left',
+		color: Color.Black
+	},
 	MenuModalTxt: {
 		padding: 5,
 		textAlign: 'right',

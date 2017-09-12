@@ -283,7 +283,7 @@ export default class App extends React.Component {
 
 
   render() {
-	  var navigationView = (<View style={AppStyle.MenuModalInner}>
+	  /*var navigationView = (<View style={AppStyle.MenuModalInner}>
 				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.newsurvey}</Text>
@@ -296,7 +296,24 @@ export default class App extends React.Component {
 				</TouchableOpacity>
 				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButtonLogout}>
 					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.logout}</Text>
-				</TouchableOpacity></View>);
+				</TouchableOpacity></View>);*/
+	  var navigationView = (<View style={AppStyle.MenuModalInner}>
+				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
+				<View>
+				<Icon.Button name="check-square-o" onPress={() => this.newSurvey()} iconStyle={{width: 32, padding:5}} backgroundColor="#ffffff" color="#000000" borderRadius={0}>
+					<Text style={AppStyle.MenuModalIconButtonTxt}>{l18n.newsurvey}</Text>
+				</Icon.Button>
+				<Icon.Button name="bar-chart" onPress={() => this.surveyResults()} iconStyle={{width: 32, padding:5}} backgroundColor="#ffffff" color="#000000" borderRadius={0}>
+					<Text style={AppStyle.MenuModalIconButtonTxt}>{l18n.surveyresults}</Text>
+				</Icon.Button>
+				<Icon.Button name="cloud-upload" onPress={() => this.sync()} iconStyle={{width: 32, padding:5}} backgroundColor="#ffffff" color="#000000" borderRadius={0}>
+					<Text style={AppStyle.MenuModalIconButtonTxt}>{l18n.syncmanual}</Text>
+				</Icon.Button>
+				</View>
+				<View style={AppStyle.MenuModalButtonLogout}>
+				<Icon.Button name="sign-out" onPress={() => this.Logout()} iconStyle={{width: 32, padding:5}} backgroundColor="#ffffff" color="#000000" borderRadius={0}>
+					<Text style={AppStyle.MenuModalIconButtonTxt}>{l18n.logout}</Text>
+				</Icon.Button></View></View>);
     return (
        <DrawerLayoutAndroid
       drawerWidth={300}
