@@ -28,7 +28,7 @@ var SurveyStorage = function () {
 		try {
 			AsyncStorage.clear();
 		} catch (e) {
-			console.warn("clearERROR", error);
+			//console.warn("clearERROR", error);
 		}
 	}
 	
@@ -138,7 +138,7 @@ var SurveyStorage = function () {
 			AsyncStorage.removeItem(key);
 			return true;
 		} catch (error) {
-			console.warn("removeERROR", error);
+			//console.warn("removeERROR", error);
 		}
 	}
 	
@@ -148,7 +148,7 @@ var SurveyStorage = function () {
 			AsyncStorage.setItem(this.prefix+":"+key, value);
 			return true;
 		} catch (error) {
-			console.warn("setERROR", error);
+			//console.warn("setERROR", error);
 		}
 	}
 	
@@ -156,7 +156,7 @@ var SurveyStorage = function () {
 		try {
 			return AsyncStorage.getItem(this.prefix+":"+key);
 		} catch (error) {
-			console.warn("getERROR", error);
+			//console.warn("getERROR", error);
 		}
 	}
 }

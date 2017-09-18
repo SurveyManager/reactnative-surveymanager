@@ -17,6 +17,7 @@ import {
 	Share,
 	Slider,
 	ProgressBar,
+	Alert,
 	} from 'react-native';
 import Color from 'react-native-material-color';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -51,14 +52,19 @@ NetInfo.addEventListener( 'change',
 
 // Global methods
 switchToLoginActivity = function (e) {
-	  if (e) {
-		  thisActivity.setState({ modalVisible: true, mainVisible: false, modalTxt: e });
-	  } else {
-		  _goLoginActivity();
-	  }
+	if (e) {
+		thisActivity.setState({ mainVisible: false});
+		Alert.alert(
+			l18n.error, e,
+			[{text: l18n.ok, onPress: () => _goLoginActivity()}],
+			{ onDismiss: () => { _goLoginActivity() } }
+		);
+	} else {
+		_goLoginActivity();
 	}
+}
 _goLoginActivity = function () {
-		thisActivity.setState({ modalVisible: false, mainVisible: false, modalLoginVisible: true,  });
+		thisActivity.setState({ mainVisible: false, modalLoginVisible: true,  });
 }
 
 clearDB = function () {
@@ -79,7 +85,6 @@ export default class App extends React.Component {
 		this.state = {
 			surveyVisible: true, 
 			resultVisible: false, 
-			modalVisible: false, 
 			modalLoginVisible: false, 
 			mainVisible: false,
 			modalProgressVisible: true,
@@ -87,7 +92,6 @@ export default class App extends React.Component {
 			modalMenu: false,
 			syncProgress: false, 
 			syncProgressPerc: "",
-			modalTxt: "",
 			email: "",
 			webViewHeight: 1,
 			survey: false,
@@ -119,7 +123,15 @@ export default class App extends React.Component {
 	}
 
 	newSurvey = function () {
-		this.setState({ modalNewSurvey: true });
+		Alert.alert(
+			l18n.newsurvey,
+			l18n.startnew,
+			[
+				{text: l18n.cancel, style: 'cancel'},
+				{text: l18n.start, onPress: () => thisActivity.doNewSurvey()},
+			],
+			{ cancelable: false }
+		)
 	}
 	
 	shareSurveyResult = function () {
@@ -132,11 +144,11 @@ export default class App extends React.Component {
 	}
 
 	doNewSurvey = function () {
-		this.setState({ surveyVisible: true, resultVisible: false });
-		this.setState({ progressData: {cur:0, total:10} });
 		this.ModalMenu('hide');
 		survey.surveyNew();
 		this.hideNewSurvey();
+		this.setState({ surveyVisible: true, resultVisible: false });
+		this.setState({ progressData: {cur:0, total:10} });
 	}
 	hideNewSurvey = function () {
 		this.setState({ modalNewSurvey: false });
@@ -205,7 +217,12 @@ export default class App extends React.Component {
 	}
 
 	doAuthError = function (r) {
-		this.setState({modalProgressVisible: false, modalVisible: true, modalTxt: "Authorization error" });
+		this.setState({modalProgressVisible: false});
+		Alert.alert(
+			l18n.error, l18n.error_auth,
+			[{text: l18n.ok, onPress: () => _goLoginActivity()}],
+			{ onDismiss: () => { _goLoginActivity() } }
+		);
 	}
 
 	doLoad = function () {
@@ -283,20 +300,6 @@ export default class App extends React.Component {
 
 
   render() {
-	  /*var navigationView = (<View style={AppStyle.MenuModalInner}>
-				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
-				<TouchableOpacity onPress={() => this.newSurvey()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.newsurvey}</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.surveyResults()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.surveyresults}</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.sync()} style={AppStyle.MenuModalButton}>
-					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.syncmanual}</Text>
-				</TouchableOpacity>
-				<TouchableOpacity onPress={() => this.Logout()} style={AppStyle.MenuModalButtonLogout}>
-					<Text style={AppStyle.MenuModalButtonTxt}>{l18n.logout}</Text>
-				</TouchableOpacity></View>);*/
 	  var navigationView = (<View style={AppStyle.MenuModalInner}>
 				<Text style={AppStyle.MenuHeader}>{this.state.email}</Text>
 				<View>
@@ -329,19 +332,6 @@ export default class App extends React.Component {
           animationType={"fade"}
           transparent={true}
           presentationStyle={"overFullScreen"}
-          visible={this.state.modalVisible}
-          onRequestClose={() => { _goLoginActivity() }}
-          >
-          <View style={AppStyle.modal}>
-          <View style={AppStyle.modalInner}>
-            <Text style={AppStyle.modalTxt}>{this.state.modalTxt}</Text>
-            <Button style={AppStyle.modalButton} onPress={() => { _goLoginActivity() }} title={l18n.ok} />
-          </View></View>
-        </Modal>
-         <Modal
-          animationType={"fade"}
-          transparent={true}
-          presentationStyle={"overFullScreen"}
           visible={this.state.modalLoginVisible}
           onRequestClose={() => { _goLoginActivity() }}
           >
@@ -365,27 +355,6 @@ export default class App extends React.Component {
           <View style={AppStyle.modal}>
 			<View style={AppStyle.modalInner}>
 				<Text style={AppStyle.modalTxt}>{l18n.loading}</Text>
-			</View>
-          </View>
-        </Modal>
-         <Modal
-          animationType={"fade"}
-          transparent={true}
-          presentationStyle={"overFullScreen"}
-          visible={this.state.modalNewSurvey}
-          onRequestClose={() => { this.hideNewSurvey() }}
-          >
-          <View style={AppStyle.modal}>
-			<View style={AppStyle.modalInner}>
-				<Text style={AppStyle.modalTxt}>{l18n.startnew}</Text>
-				<View style={AppStyle.modalButtons}>
-					<TouchableOpacity onPress={() => this.doNewSurvey() } style={MainScreenStyles.NavBtn}>
-						<Text style={MainScreenStyles.NavBtnTxtAlert}>{l18n.start}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => this.hideNewSurvey() } style={MainScreenStyles.NavBtn}>
-						<Text style={MainScreenStyles.NavBtnTxt}>{l18n.cancel}</Text>
-					</TouchableOpacity>
-				</View>			
 			</View>
           </View>
         </Modal>

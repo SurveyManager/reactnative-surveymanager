@@ -24,7 +24,12 @@ var l18n = new LocalizedStrings({
 		nexttostart:"Press > button to start survey",
 		syncmanual:"Sync manualy",
 		surveyresults: "Survey results",
-		totalanswers: "Total answers"},
+		totalanswers: "Total answers",
+		error: "Error",
+		error_auth: "Authorization error",
+		error_no_survey: "No survey in cache, Internet connection required",
+		error_internal: "Internal error, try again later",
+		},
 	ru:{
 		htitle: "Опрос",
 		loading: "Загрузка...",
@@ -48,8 +53,13 @@ var l18n = new LocalizedStrings({
 		nexttostart:"Нажмите > чтобы начать опрос",
 		syncmanual:"Синхронизировать",
 		surveyresults: "Результаты опроса",
-		totalanswers: "Всего ответов"},
-		
+		totalanswers: "Всего ответов",
+		error: "Ошибка",
+		error_auth: "Ошибка авторизации",
+		error_no_survey: "Опрос не был сохранен в памяти, требуется интернет подключение",
+		error_internal: "Ошибка, попробуйте позже",
+
+		},
   });
 
 module.exports = l18n;

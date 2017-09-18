@@ -338,13 +338,16 @@ var SurveyManager = function () {
 	}
 	
 	this.getSurveyLoadError = function (r) {
-		console.warn("SurveyERROR",r);
+		//console.warn("SurveyERROR",r);
 		if (r[0]=='access_denied') {
 			this.storage.setToken("");
-			switchToLoginActivity(r[0]);
-		} else if (r[0]=='no_survey_in_cache' || r[0]=='internal_parse_error') {
+			switchToLoginActivity(l18n.error_auth);
+		} else if (r[0]=='no_survey_in_cache') {
 			this.storage.setToken("");
-			switchToLoginActivity(r[0]);
+			switchToLoginActivity(l18n.error_no_survey);
+		} else if (r[0]=='internal_parse_error') {
+			this.storage.setToken("");
+			switchToLoginActivity(l18n.error_internal);
 		}
 	}
 	

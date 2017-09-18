@@ -1,6 +1,6 @@
 {
   "name": "SilverStripeSurveyClient",
-  "version": "0.7.9",
+  "version": "0.8.6",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
