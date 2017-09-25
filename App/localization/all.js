@@ -29,6 +29,7 @@ var l18n = new LocalizedStrings({
 		error_auth: "Authorization error",
 		error_no_survey: "No survey in cache, Internet connection required",
 		error_internal: "Internal error, try again later",
+		error_qtype: "Unknown question type",
 		},
 	ru:{
 		htitle: "Опрос",
@@ -58,7 +59,7 @@ var l18n = new LocalizedStrings({
 		error_auth: "Ошибка авторизации",
 		error_no_survey: "Опрос не был сохранен в памяти, требуется интернет подключение",
 		error_internal: "Ошибка, попробуйте позже",
-
+		error_qtype: "Неизвестный тип вопроса",
 		},
   });
 

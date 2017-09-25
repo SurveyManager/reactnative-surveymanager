@@ -165,7 +165,7 @@ var SurveyManager = function () {
 			this.questionFormState.type = this.currentQuestion.type;
 		}
 		if (this.getSurveyCallback) {
-			let r = (<View>Unknown question type</View>);
+			let r = (<View><Text style={SurveyStyles.otherText}>{l18n.error_qtype}</Text></View>);
 			let rother = (<View></View>);
 			if (this.currentQuestion.type=='text') {
 				this.questionFormState.oid = 0;
